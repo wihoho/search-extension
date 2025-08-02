@@ -40,6 +40,61 @@
                 </div>
             </div>
 
+            <!-- Smart Detection Section -->
+            <div class="section" id="smart-detection-section" style="display: none;">
+                <h2>🔍 Smart Detection</h2>
+                <div class="smart-detection-card" id="smart-detection-card">
+                    <div class="detection-loading" id="detection-loading">
+                        <div class="spinner"></div>
+                        <span>Analyzing current website...</span>
+                    </div>
+                    <div class="detection-result" id="detection-result" style="display: none;">
+                        <div class="detection-header">
+                            <img class="detection-icon" id="detection-icon" src="" alt="">
+                            <div class="detection-info">
+                                <h3 id="detection-title">Website Name</h3>
+                                <p id="detection-description">Search functionality detected</p>
+                            </div>
+                        </div>
+                        <div class="detection-details">
+                            <div class="detection-field">
+                                <label>Suggested Keyword:</label>
+                                <span id="suggested-keyword">keyword</span>
+                            </div>
+                            <div class="detection-field">
+                                <label>Detected Search URL:</label>
+                                <span id="detected-url" class="url-preview">https://example.com/search?q=%s</span>
+                            </div>
+                            <div class="detection-confidence">
+                                <label>Confidence:</label>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" id="confidence-fill"></div>
+                                </div>
+                                <span id="confidence-text">85%</span>
+                            </div>
+                        </div>
+                        <div class="detection-actions">
+                            <button class="btn btn-primary" id="add-detected-shortcut">
+                                <span class="btn-icon">✨</span>
+                                Add as Shortcut
+                            </button>
+                            <button class="btn btn-secondary" id="edit-detected-shortcut">
+                                <span class="btn-icon">✏️</span>
+                                Edit & Add
+                            </button>
+                        </div>
+                    </div>
+                    <div class="detection-error" id="detection-error" style="display: none;">
+                        <div class="error-icon">❌</div>
+                        <div class="error-content">
+                            <h3>No Search Detected</h3>
+                            <p>We couldn't detect search functionality on this website. You can still add a custom shortcut manually.</p>
+                            <button class="btn btn-secondary" id="manual-add-btn">Add Custom Shortcut</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="section">
                 <div class="section-header">
                     <h2>Search Shortcuts</h2>

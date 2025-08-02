@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniSearch Custom Shortcuts Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+        .test-case {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .test-case h3 {
+            margin: 0 0 10px 0;
+            color: #555;
+        }
+        .test-steps {
+            list-style: none;
+            padding: 0;
+        }
+        .test-steps li {
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #28a745;
+        }
+        .test-steps li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+        .expected-result {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            border-left: 3px solid #28a745;
+        }
+        .expected-result strong {
+            color: #2d5a2d;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 OmniSearch Custom Shortcuts Test Suite</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Important:</strong> Load the OmniSearch extension in Chrome before running these tests. 
+            Make sure you have the latest version with the custom shortcut fixes.
+        </div>
+
+        <!-- Basic Functionality Tests -->
+        <div class="test-section">
+            <h2>🔧 Basic Custom Shortcut Management</h2>
+            
+            <div class="test-case">
+                <h3>Test Case 1: Add Custom Shortcut</h3>
+                <ol class="test-steps">
+                    <li>Click the OmniSearch extension icon</li>
+                    <li>Click the <span class="code">+ Add Custom</span> button</li>
+                    <li>Fill in the form:
+                        <ul>
+                            <li>Keyword: <span class="code">reddit</span></li>
+                            <li>Website Name: <span class="code">Reddit</span></li>
+                            <li>Search URL: <span class="code">https://www.reddit.com/search/?q=%s</span></li>
+                        </ul>
+                    </li>
+                    <li>Click <span class="code">Save</span></li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Success notification appears, modal closes, Reddit shortcut appears in the list with Edit and Delete buttons visible.
+                </div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 2: Edit Custom Shortcut</h3>
+                <ol class="test-steps">
+                    <li>Find the Reddit shortcut created in Test Case 1</li>
+                    <li>Click the <span class="code">Edit</span> button</li>
+                    <li>Change the Website Name to <span class="code">Reddit Community</span></li>
+                    <li>Click <span class="code">Update</span></li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Edit modal opens with pre-filled values, keyword field is disabled, success notification shows "updated", shortcut name changes to "Reddit Community".
+                </div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 3: Delete Custom Shortcut</h3>
+                <ol class="test-steps">
+                    <li>Find the Reddit shortcut</li>
+                    <li>Click the <span class="code">Delete</span> button</li>
+                    <li>Confirm deletion in the dialog</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Confirmation dialog appears, after confirming, success notification shows "deleted", shortcut disappears from list.
+                </div>
+            </div>
+        </div>
+
+        <!-- Edge Cases -->
+        <div class="test-section">
+            <h2>⚠️ Edge Cases and Error Handling</h2>
+            
+            <div class="test-case">
+                <h3>Test Case 4: Invalid Keyword</h3>
+                <ol class="test-steps">
+                    <li>Try to add a shortcut with keyword: <span class="code">test-site</span> (contains hyphen)</li>
+                    <li>Try to add a shortcut with keyword: <span class="code">Test Site</span> (contains space and uppercase)</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Error message: "Keyword can only contain lowercase letters and numbers."
+                </div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 5: Missing %s in URL</h3>
+                <ol class="test-steps">
+                    <li>Try to add a shortcut with URL: <span class="code">https://example.com/search?q=test</span> (no %s)</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Error message: "URL must contain %s as a placeholder for the search query."
+                </div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 6: Duplicate Keyword</h3>
+                <ol class="test-steps">
+                    <li>Try to add a shortcut with keyword: <span class="code">youtube</span> (already exists as default)</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Error message: "A shortcut with this keyword already exists."
+                </div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 7: Special Characters in Names</h3>
+                <ol class="test-steps">
+                    <li>Add a shortcut with name: <span class="code">Stack Overflow Q&A</span></li>
+                    <li>Add a shortcut with name containing emojis: <span class="code">🎵 Music Site</span></li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Both shortcuts should be created successfully and display correctly in the list.
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Detection Integration -->
+        <div class="test-section">
+            <h2>🔍 Smart Detection Integration</h2>
+            
+            <div class="test-case">
+                <h3>Test Case 8: Smart Detection Edit/Delete</h3>
+                <ol class="test-steps">
+                    <li>Navigate to a website like reddit.com or stackoverflow.com</li>
+                    <li>Click the OmniSearch extension icon</li>
+                    <li>If smart detection works, click <span class="code">Add as Shortcut</span></li>
+                    <li>Try to edit the auto-created shortcut</li>
+                    <li>Try to delete the auto-created shortcut</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Auto-detected shortcuts should have fully functional Edit and Delete buttons, just like manually created ones.
+                </div>
+            </div>
+        </div>
+
+        <!-- Functional Testing -->
+        <div class="test-section">
+            <h2>🚀 Functional Testing</h2>
+            
+            <div class="test-case">
+                <h3>Test Case 9: Test Custom Shortcut in Omnibox</h3>
+                <ol class="test-steps">
+                    <li>Create a custom shortcut (e.g., keyword: <span class="code">test</span>)</li>
+                    <li>Type <span class="code">os</span> in Chrome's address bar</li>
+                    <li>Press Tab</li>
+                    <li>Type <span class="code">test hello world</span></li>
+                    <li>Press Enter</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> Browser should navigate to the custom search URL with "hello world" as the search term.
+                </div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 10: Toggle Custom Shortcut</h3>
+                <ol class="test-steps">
+                    <li>Create a custom shortcut</li>
+                    <li>Toggle it off using the switch</li>
+                    <li>Try to use it in the omnibox</li>
+                    <li>Toggle it back on</li>
+                    <li>Try to use it again</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> When disabled, shortcut shouldn't appear in omnibox suggestions. When enabled, it should work normally.
+                </div>
+            </div>
+        </div>
+
+        <!-- Persistence Testing -->
+        <div class="test-section">
+            <h2>💾 Persistence and State Management</h2>
+            
+            <div class="test-case">
+                <h3>Test Case 11: Persistence Across Sessions</h3>
+                <ol class="test-steps">
+                    <li>Create several custom shortcuts</li>
+                    <li>Close the popup</li>
+                    <li>Close and reopen Chrome</li>
+                    <li>Open the OmniSearch popup again</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> All custom shortcuts should still be present with Edit and Delete buttons working.
+                </div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 12: Multiple Operations</h3>
+                <ol class="test-steps">
+                    <li>Add 3 custom shortcuts</li>
+                    <li>Edit the second one</li>
+                    <li>Delete the first one</li>
+                    <li>Add another shortcut</li>
+                    <li>Toggle one off and on</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> All operations should work smoothly with proper success notifications and UI updates.
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Testing -->
+        <div class="test-section">
+            <h2>⚡ Performance and UI Responsiveness</h2>
+            
+            <div class="test-case">
+                <h3>Test Case 13: Rapid Operations</h3>
+                <ol class="test-steps">
+                    <li>Quickly add 5 custom shortcuts</li>
+                    <li>Rapidly click Edit buttons on different shortcuts</li>
+                    <li>Quickly delete multiple shortcuts</li>
+                </ol>
+                <div class="expected-result">
+                    <strong>Expected Result:</strong> UI should remain responsive, no duplicate modals, proper state management throughout.
+                </div>
+            </div>
+        </div>
+
+        <div class="warning">
+            <strong>📝 Test Results:</strong> Document any failures or unexpected behavior. 
+            Check the browser console for JavaScript errors during testing.
+        </div>
+    </div>
+</body>
+</html>
