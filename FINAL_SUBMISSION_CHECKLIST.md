@@ -111,7 +111,7 @@ Privacy Policy: [Host PRIVACY_POLICY.md content and add URL]
 #### Permissions Justification
 ```
 storage: Save user shortcuts and preferences locally
-activeTab: Open search results in current tab
+tabs: Open search results in new tabs and update current tab with search URLs
 ```
 
 ### Step 5: Distribution

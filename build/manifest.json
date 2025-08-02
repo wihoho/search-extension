@@ -5,7 +5,7 @@
   "description": "Quick search shortcuts for popular websites directly from Chrome's address bar",
   "permissions": [
     "storage",
-    "activeTab"
+    "tabs"
   ],
   "background": {
     "service_worker": "background.js"

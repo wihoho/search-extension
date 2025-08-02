@@ -141,8 +141,8 @@ Add the URL to store listing
 
 #### Permissions Justification
 ```
-storage: Required to save user shortcuts and preferences
-activeTab: Required to open search results in current tab
+storage: Required to save user shortcuts and preferences locally
+tabs: Required to open search results in new tabs and update current tab with search URLs
 ```
 
 #### Data Usage Disclosure
