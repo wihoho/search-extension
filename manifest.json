@@ -8,16 +8,17 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://aistudio.google.com/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://aistudio.google.com/*"],
-      "js": ["automation-script.js"],
-      "run_at": "document_idle"
+      "matches": ["<all_urls>"],
+      "js": ["automation-script.js", "element-selector.js"],
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ],
   "action": {

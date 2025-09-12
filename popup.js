@@ -27,8 +27,25 @@ function editShortcut(keyword) {
         document.getElementById('modal-title').textContent = 'Edit Shortcut';
         document.getElementById('shortcut-keyword').value = keyword;
         document.getElementById('shortcut-name').value = shortcut.name;
-        document.getElementById('shortcut-url').value = shortcut.url;
         document.getElementById('save-btn').textContent = 'Update';
+
+        // Handle shortcut type
+        const isAdvanced = shortcut.type === 'advanced';
+        const simpleRadio = document.querySelector('input[name="shortcut-type"][value="simple"]');
+        const advancedRadio = document.querySelector('input[name="shortcut-type"][value="advanced"]');
+        
+        if (isAdvanced) {
+            advancedRadio.checked = true;
+            document.getElementById('advanced-url').value = shortcut.url || '';
+            document.getElementById('input-selector').value = shortcut.inputSelector || '';
+            document.getElementById('button-selector').value = shortcut.buttonSelector || '';
+        } else {
+            simpleRadio.checked = true;
+            document.getElementById('shortcut-url').value = shortcut.url || '';
+        }
+
+        // Trigger type change to show/hide appropriate fields
+        handleShortcutTypeChange();
 
         // Disable keyword field for editing
         document.getElementById('shortcut-keyword').disabled = true;
@@ -175,6 +192,24 @@ function setupEventListeners() {
             openModal();
         });
     }
+
+    // Advanced shortcut type radio buttons
+    const typeRadios = document.querySelectorAll('input[name="shortcut-type"]');
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', handleShortcutTypeChange);
+    });
+
+    // Element selection buttons
+    const selectInputBtn = document.getElementById('select-input-btn');
+    const selectButtonBtn = document.getElementById('select-button-btn');
+
+    if (selectInputBtn) {
+        selectInputBtn.addEventListener('click', () => selectElement('input'));
+    }
+
+    if (selectButtonBtn) {
+        selectButtonBtn.addEventListener('click', () => selectElement('button'));
+    }
 }
 
 // Switch between tabs
@@ -203,7 +238,7 @@ function renderShortcuts() {
 // Create shortcut element
 function createShortcutElement(keyword, shortcut) {
     const div = document.createElement('div');
-    div.className = 'shortcut-item';
+    div.className = `shortcut-item${shortcut.type === 'advanced' ? ' advanced' : ''}`;
 
     const isCustom = !isDefaultShortcut(keyword);
 
@@ -280,6 +315,10 @@ function closeModal() {
     document.getElementById('modal-title').textContent = 'Add Custom Shortcut';
     document.getElementById('save-btn').textContent = 'Save';
     document.getElementById('shortcut-keyword').disabled = false;
+    
+    // Reset shortcut type to simple
+    document.querySelector('input[name="shortcut-type"][value="simple"]').checked = true;
+    handleShortcutTypeChange();
 }
 
 // Handle form submission
@@ -289,11 +328,11 @@ async function handleFormSubmit(e) {
     try {
         const keyword = document.getElementById('shortcut-keyword').value.toLowerCase().trim();
         const name = document.getElementById('shortcut-name').value.trim();
-        const url = document.getElementById('shortcut-url').value.trim();
+        const shortcutType = document.querySelector('input[name="shortcut-type"]:checked').value;
 
-        // Validation
-        if (!keyword || !name || !url) {
-            alert('Please fill in all fields.');
+        // Basic validation
+        if (!keyword || !name) {
+            alert('Please fill in keyword and name fields.');
             return;
         }
 
@@ -302,22 +341,64 @@ async function handleFormSubmit(e) {
             return;
         }
 
-        if (!url.includes('%s')) {
-            alert('URL must contain %s as a placeholder for the search query.');
-            return;
-        }
-
-        // Validate URL format
-        try {
-            new URL(url.replace('%s', 'test'));
-        } catch (urlError) {
-            alert('Please enter a valid URL.');
-            return;
-        }
-
         if (!editingShortcut && shortcuts[keyword]) {
             alert('A shortcut with this keyword already exists.');
             return;
+        }
+
+        let shortcutData = {
+            name: name,
+            enabled: true
+        };
+
+        if (shortcutType === 'simple') {
+            const url = document.getElementById('shortcut-url').value.trim();
+            
+            if (!url) {
+                alert('Please enter a search URL.');
+                return;
+            }
+
+            if (!url.includes('%s')) {
+                alert('URL must contain %s as a placeholder for the search query.');
+                return;
+            }
+
+            // Validate URL format
+            try {
+                new URL(url.replace('%s', 'test'));
+            } catch (urlError) {
+                alert('Please enter a valid URL.');
+                return;
+            }
+
+            shortcutData.url = url;
+            shortcutData.type = 'simple';
+            shortcutData.icon = `https://www.google.com/s2/favicons?domain=${new URL(url.replace('%s', '')).hostname}`;
+
+        } else if (shortcutType === 'advanced') {
+            const pageUrl = document.getElementById('advanced-url').value.trim();
+            const inputSelector = document.getElementById('input-selector').value.trim();
+            const buttonSelector = document.getElementById('button-selector').value.trim();
+
+            if (!pageUrl || !inputSelector || !buttonSelector) {
+                alert('Please fill in all advanced configuration fields.');
+                return;
+            }
+
+            // Validate page URL format
+            try {
+                new URL(pageUrl);
+            } catch (urlError) {
+                alert('Please enter a valid page URL.');
+                return;
+            }
+
+            shortcutData.url = pageUrl;
+            shortcutData.type = 'advanced';
+            shortcutData.inputSelector = inputSelector;
+            shortcutData.buttonSelector = buttonSelector;
+            shortcutData.icon = `https://www.google.com/s2/favicons?domain=${new URL(pageUrl).hostname}`;
         }
 
         // Determine if this is an edit or new shortcut
@@ -325,12 +406,7 @@ async function handleFormSubmit(e) {
         const actionText = isEditing ? 'updated' : 'added';
 
         // Save shortcut
-        shortcuts[keyword] = {
-            name: name,
-            url: url,
-            enabled: true,
-            icon: `https://www.google.com/s2/favicons?domain=${new URL(url.replace('%s', '')).hostname}`
-        };
+        shortcuts[keyword] = shortcutData;
 
         await saveShortcuts();
         renderShortcuts();
@@ -338,11 +414,11 @@ async function handleFormSubmit(e) {
         closeModal();
 
         // Show success feedback
-        showSuccessFeedback(`Successfully ${actionText} "${name}" shortcut with keyword "${keyword}"`);
+        showSuccessFeedback(`Shortcut "${name}" ${actionText} successfully`);
 
     } catch (error) {
         console.error('Error saving shortcut:', error);
-        alert('Failed to save shortcut. Please check your inputs and try again.');
+        alert('Failed to save shortcut. Please try again.');
     }
 }
 
@@ -682,3 +758,106 @@ function showSuccessFeedback(message) {
 }
 
 // Functions are already made globally available at the top of the file
+
+// Handle shortcut type change
+function handleShortcutTypeChange() {
+    const shortcutType = document.querySelector('input[name="shortcut-type"]:checked').value;
+    const simpleGroup = document.getElementById('simple-url-group');
+    const advancedGroup = document.getElementById('advanced-config-group');
+
+    if (shortcutType === 'simple') {
+        simpleGroup.classList.remove('hidden');
+        advancedGroup.classList.add('hidden');
+        
+        // Make simple URL required
+        document.getElementById('shortcut-url').required = true;
+        document.getElementById('advanced-url').required = false;
+        document.getElementById('input-selector').required = false;
+        document.getElementById('button-selector').required = false;
+    } else {
+        simpleGroup.classList.add('hidden');
+        advancedGroup.classList.remove('hidden');
+        
+        // Make advanced fields required
+        document.getElementById('shortcut-url').required = false;
+        document.getElementById('advanced-url').required = true;
+        document.getElementById('input-selector').required = true;
+        document.getElementById('button-selector').required = true;
+    }
+}
+
+// Select element on current tab
+async function selectElement(elementType) {
+    try {
+        // Get current active tab
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+        if (!tab || !tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
+            alert('Element selection is not available on this page. Please navigate to the target website first.');
+            return;
+        }
+
+        // Disable the button to prevent multiple clicks
+        const button = elementType === 'input' ? 
+            document.getElementById('select-input-btn') : 
+            document.getElementById('select-button-btn');
+        
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Click on page...';
+
+        try {
+            // Send message to content script to start element selection
+            const result = await chrome.tabs.sendMessage(tab.id, {
+                action: 'startElementSelection',
+                type: elementType
+            });
+
+            if (result && result.selector) {
+                // Fill in the selector field
+                const selectorField = elementType === 'input' ? 
+                    document.getElementById('input-selector') : 
+                    document.getElementById('button-selector');
+                
+                selectorField.value = result.selector;
+                
+                // Show success feedback
+                showSuccessFeedback(`Selected ${elementType} element: ${result.description}`);
+            } else if (result === null) {
+                // User cancelled
+                console.log('Element selection cancelled');
+            } else {
+                alert('Failed to select element. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error selecting element:', error);
+            if (error.message.includes('Could not establish connection')) {
+                alert('Please switch to the target website tab and try again.');
+            } else {
+                alert('Failed to select element. Please ensure the page is fully loaded and try again.');
+            }
+        }
+
+        // Re-enable the button
+        button.disabled = false;
+        button.textContent = originalText;
+
+    } catch (error) {
+        console.error('Error in selectElement:', error);
+        alert('Failed to start element selection. Please try again.');
+    }
+}
+
+// Validate selector by testing it
+async function validateSelector(selector, elementType) {
+    if (!selector) return false;
+
+    try {
+        // Test if selector is valid CSS
+        document.querySelector(selector);
+        return true;
+    } catch (error) {
+        console.warn(`Invalid ${elementType} selector:`, selector, error);
+        return false;
+    }
+}

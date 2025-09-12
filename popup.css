@@ -673,3 +673,158 @@ form {
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+/* Radio Group Styles */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.radio-label:hover {
+    background-color: #f5f5f5;
+}
+
+.radio-label input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    position: relative;
+    transition: border-color 0.2s;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+    border-color: #4285f4;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    background-color: #4285f4;
+    border-radius: 50%;
+}
+
+/* Element Selector Styles */
+.element-selector-section {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e1e5e9;
+}
+
+.element-selector-row {
+    display: flex;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+}
+
+.element-field {
+    flex: 1;
+}
+
+.element-field label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: #333;
+}
+
+.element-field input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.element-field small {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 11px;
+}
+
+.btn-select {
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+.btn-select:hover {
+    background-color: #3367d6;
+}
+
+.btn-select:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.selector-help {
+    background-color: #e8f0fe;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #4285f4;
+    margin-top: 8px;
+}
+
+.selector-help p {
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    color: #1a73e8;
+}
+
+.selector-help ol {
+    margin: 0;
+    padding-left: 20px;
+    color: #5f6368;
+    font-size: 12px;
+}
+
+.selector-help li {
+    margin-bottom: 4px;
+}
+
+/* Advanced shortcut badge in shortcuts list */
+.shortcut-item.advanced {
+    border-left: 4px solid #ff9800;
+}
+
+.shortcut-item.advanced .shortcut-info::after {
+    content: 'ADVANCED';
+    display: inline-block;
+    background-color: #ff9800;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-weight: 500;
+}
