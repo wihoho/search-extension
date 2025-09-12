@@ -158,11 +158,72 @@
                     <label for="shortcut-name">Website Name</label>
                     <input type="text" id="shortcut-name" placeholder="e.g., Reddit" required>
                 </div>
+                
+                <!-- Shortcut Type Selection -->
                 <div class="form-group">
+                    <label>Shortcut Type</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="shortcut-type" value="simple" checked>
+                            <span class="radio-custom"></span>
+                            Simple URL Search
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="shortcut-type" value="advanced">
+                            <span class="radio-custom"></span>
+                            Advanced Page Automation
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Simple URL Configuration -->
+                <div class="form-group" id="simple-url-group">
                     <label for="shortcut-url">Search URL</label>
                     <input type="url" id="shortcut-url" placeholder="https://www.reddit.com/search/?q=%s" required>
                     <small>Use %s where the search query should be inserted</small>
                 </div>
+                
+                <!-- Advanced Configuration -->
+                <div class="form-group hidden" id="advanced-config-group">
+                    <label for="advanced-url">Page URL</label>
+                    <input type="url" id="advanced-url" placeholder="https://example.com/search">
+                    <small>The page where the search will be performed</small>
+                    
+                    <div class="element-selector-section">
+                        <div class="element-selector-row">
+                            <div class="element-field">
+                                <label for="input-selector">Input Element Selector</label>
+                                <input type="text" id="input-selector" placeholder="textarea, input[type='text'], etc.">
+                                <small>CSS selector for the search input field</small>
+                            </div>
+                            <button type="button" class="btn btn-select" id="select-input-btn">
+                                🎯 Select on Page
+                            </button>
+                        </div>
+                        
+                        <div class="element-selector-row">
+                            <div class="element-field">
+                                <label for="button-selector">Submit Button Selector</label>
+                                <input type="text" id="button-selector" placeholder="button[type='submit'], .search-btn, etc.">
+                                <small>CSS selector for the submit button</small>
+                            </div>
+                            <button type="button" class="btn btn-select" id="select-button-btn">
+                                🎯 Select on Page
+                            </button>
+                        </div>
+                        
+                        <div class="selector-help">
+                            <p><strong>How to use element selection:</strong></p>
+                            <ol>
+                                <li>Navigate to the target website in another tab</li>
+                                <li>Come back to this popup and click "Select on Page"</li>
+                                <li>Switch to the website tab and click on the desired element</li>
+                                <li>The selector will be automatically filled in</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="save-btn">Save</button>
