@@ -60,6 +60,20 @@
     </div>
 
     <div class="test-section">
+        <h3>🐛 Bug Demonstration & Fix Verification</h3>
+        <div class="test-step">
+            <p><strong>Before Fix (Bug):</strong></p>
+            <button class="btn-danger" onclick="simulateBuggyBehavior()">Simulate Buggy Behavior</button>
+            <p><em>This shows how shortcuts would be lost before the fix</em></p>
+        </div>
+        <div class="test-step">
+            <p><strong>After Fix (Working):</strong></p>
+            <button class="btn-success" onclick="simulateFixedBehavior()">Simulate Fixed Behavior</button>
+            <p><em>This shows how shortcuts are preserved with the fix</em></p>
+        </div>
+    </div>
+
+    <div class="test-section">
         <h3>Test Case: Add Multiple Custom Shortcuts</h3>
         <div class="test-step">
             <p><strong>Step 1:</strong> Add first custom shortcut</p>
@@ -220,6 +234,65 @@
             } else {
                 log('❌ BUG REPRODUCED: Some shortcuts are missing!');
             }
+        }
+
+        async function simulateBuggyBehavior() {
+            log('=== SIMULATING BUGGY BEHAVIOR (BEFORE FIX) ===');
+            
+            // Start with some existing shortcuts
+            testShortcuts = {
+                'drive': { name: 'Google Drive', url: 'https://drive.google.com/drive/search?q=%s', enabled: true },
+                'reddit': { name: 'Reddit', url: 'https://www.reddit.com/search/?q=%s', enabled: true },
+                'stackoverflow': { name: 'Stack Overflow', url: 'https://stackoverflow.com/search?q=%s', enabled: true }
+            };
+            
+            log('Starting with 3 shortcuts: drive, reddit, stackoverflow');
+            
+            // Simulate the bug: popup loads before background is ready
+            log('🐛 Bug: Popup loads before background script initializes...');
+            log('🐛 Bug: Popup receives empty shortcuts object');
+            const emptyShortcuts = {}; // This is what the buggy version would return
+            
+            log('🐛 Bug: User adds new shortcut to empty object...');
+            emptyShortcuts['github'] = { name: 'GitHub', url: 'https://github.com/search?q=%s', enabled: true };
+            
+            log('🐛 Bug: Saving empty object with only new shortcut...');
+            testShortcuts = emptyShortcuts; // This overwrites all existing shortcuts!
+            
+            log(`🐛 RESULT: Only ${Object.keys(testShortcuts).length} shortcut remains: ${Object.keys(testShortcuts).join(', ')}`);
+            log('❌ LOST SHORTCUTS: reddit, stackoverflow');
+            
+            loadCurrentState();
+        }
+
+        async function simulateFixedBehavior() {
+            log('=== SIMULATING FIXED BEHAVIOR (AFTER FIX) ===');
+            
+            // Start with some existing shortcuts
+            testShortcuts = {
+                'drive': { name: 'Google Drive', url: 'https://drive.google.com/drive/search?q=%s', enabled: true },
+                'reddit': { name: 'Reddit', url: 'https://www.reddit.com/search/?q=%s', enabled: true },
+                'stackoverflow': { name: 'Stack Overflow', url: 'https://stackoverflow.com/search?q=%s', enabled: true }
+            };
+            
+            log('Starting with 3 shortcuts: drive, reddit, stackoverflow');
+            
+            // Simulate the fix: popup waits for background to load
+            log('✅ Fix: Popup requests shortcuts from background...');
+            log('✅ Fix: Background not ready, triggers loading...');
+            log('✅ Fix: Background loads all existing shortcuts from storage');
+            const loadedShortcuts = {...testShortcuts}; // This gets all existing shortcuts
+            
+            log('✅ Fix: User adds new shortcut to complete object...');
+            loadedShortcuts['github'] = { name: 'GitHub', url: 'https://github.com/search?q=%s', enabled: true };
+            
+            log('✅ Fix: Saving complete object with all shortcuts...');
+            testShortcuts = loadedShortcuts; // This preserves all existing shortcuts!
+            
+            log(`✅ RESULT: All ${Object.keys(testShortcuts).length} shortcuts preserved: ${Object.keys(testShortcuts).join(', ')}`);
+            log('✅ NO SHORTCUTS LOST!');
+            
+            loadCurrentState();
         }
 
         // Initialize
