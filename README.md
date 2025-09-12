@@ -7,7 +7,8 @@ A powerful Chrome extension that provides quick search shortcuts for popular web
 - **Quick Search Shortcuts**: Type keywords in the address bar to search specific websites instantly
 - **Pre-configured Popular Sites**: Built-in support for Google Drive, Gmail, YouTube, Amazon, Wikipedia, IMDb, Spotify, GitHub, and Twitter
 - **Custom Shortcuts**: Add your own search shortcuts for any website
-- **Simple Interface**: Clean, intuitive settings panel for managing shortcuts
+- **Non-Intrusive Sidebar**: Clean sidebar interface that slides in from the right without blocking webpage content
+- **Keyboard Shortcut**: Quick access with `Ctrl+Shift+S` (Windows/Linux) or `Cmd+Shift+S` (Mac)
 - **Tab-to-Search**: Familiar Chrome omnibox behavior with tab activation
 - **Real-time Suggestions**: Get search suggestions as you type
 
@@ -49,7 +50,14 @@ A powerful Chrome extension that provides quick search shortcuts for popular web
 
 ## ⚙️ Configuration
 
-Click the OmniSearch icon in your Chrome toolbar to access settings:
+Access OmniSearch settings through the sidebar interface:
+
+### Opening the Sidebar
+
+- **Extension Icon**: Click the OmniSearch icon in your Chrome toolbar
+- **Keyboard Shortcut**: Press `Ctrl+Shift+S` (Windows/Linux) or `Cmd+Shift+S` (Mac)
+
+The sidebar slides in from the right side of your screen without blocking the page content, allowing you to manage settings while keeping the webpage fully interactive.
 
 ### Built-in Shortcuts
 
@@ -69,12 +77,15 @@ The extension comes with these pre-configured shortcuts:
 
 ### Custom Shortcuts
 
-Add your own shortcuts by:
+Add your own shortcuts using the sidebar interface:
 
-1. Clicking the "+ Add Custom" button in settings
-2. Entering a keyword (e.g., "reddit")
-3. Providing the website name (e.g., "Reddit")
-4. Adding the search URL with `%s` placeholder (e.g., `https://www.reddit.com/search/?q=%s`)
+1. Open the sidebar (click extension icon or press `Ctrl+Shift+S`)
+2. Click the "+ Add Custom" button in the shortcuts section
+3. Enter a keyword (e.g., "reddit")
+4. Provide the website name (e.g., "Reddit")
+5. Add the search URL with `%s` placeholder (e.g., `https://www.reddit.com/search/?q=%s`)
+
+The sidebar allows you to manage shortcuts without interrupting your browsing workflow.
 
 ## 🏗️ Project Structure
 
@@ -82,9 +93,14 @@ Add your own shortcuts by:
 search-extension/
 ├── manifest.json          # Extension manifest (Manifest V3)
 ├── background.js          # Service worker handling omnibox functionality
-├── popup.html            # Settings interface HTML
-├── popup.css             # Settings interface styles
-├── popup.js              # Settings interface logic
+├── sidebar.js             # Sidebar interface injected into web pages
+├── sidebar.css            # Sidebar styles with slide animation
+├── popup.html            # Legacy popup interface (for reference)
+├── popup.css             # Legacy popup styles (for reference)
+├── popup.js              # Legacy popup logic (for reference)
+├── content-script.js     # Content script for search detection
+├── automation-script.js  # Advanced search automation
+├── element-selector.js   # Element selection utilities
 ├── icons/                # Extension icons (16, 32, 48, 128px)
 │   └── README.md         # Icon requirements and guidelines
 └── README.md             # This file
@@ -93,9 +109,11 @@ search-extension/
 ## 🔧 Technical Details
 
 - **Manifest Version**: 3 (latest Chrome extension standard)
-- **Permissions**: `storage`, `activeTab`
-- **APIs Used**: `chrome.omnibox`, `chrome.storage`, `chrome.tabs`
+- **Permissions**: `storage`, `scripting`
+- **APIs Used**: `chrome.omnibox`, `chrome.storage`, `chrome.tabs`, `chrome.action`, `chrome.commands`
+- **Interface**: Sidebar injection system that doesn't block page content
 - **Storage**: Local sync storage for user preferences and custom shortcuts
+- **Keyboard Shortcuts**: `Ctrl+Shift+S` (Windows/Linux) or `Cmd+Shift+S` (Mac) to toggle sidebar
 
 ## 🤝 Contributing
 
