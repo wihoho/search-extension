@@ -25,6 +25,7 @@ A powerful Chrome extension that provides quick search shortcuts for popular web
 - `os drive quarterly report` → Search Google Drive for "quarterly report"
 - `os amazon laptop` → Search Amazon for "laptop"
 - `os github react` → Search GitHub for "react"
+- `os ai-studio my prompt` → Search AI Studio for "my prompt"
 
 ## 🛠️ Installation
 
@@ -46,7 +47,7 @@ A powerful Chrome extension that provides quick search shortcuts for popular web
 
 ### For Users
 
-*Coming soon to Chrome Web Store*
+[*Chrome Web Store*](https://chromewebstore.google.com/detail/omnisearch/eihpnhdoneijgoppfeldaclpkllomacc?authuser=0&hl=en)
 
 ## ⚙️ Configuration
 
@@ -74,6 +75,7 @@ The extension comes with these pre-configured shortcuts:
 | `spotify` | Spotify | Search Spotify music |
 | `github` | GitHub | Search GitHub repositories |
 | `twitter` | Twitter | Search Twitter posts |
+| `ai-studio` | AI Studio | Search AI Studio |
 
 ### Custom Shortcuts
 
