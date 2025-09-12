@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OmniSearch XPath Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        input, textarea, button { margin: 10px; padding: 10px; }
+        .results { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>OmniSearch XPath Selector Test Page</h1>
+    
+    <div class="section">
+        <h2>Test Form for Element Selection</h2>
+        
+        <!-- Elements with IDs -->
+        <div>
+            <label>Search Input (with ID):</label>
+            <input type="text" id="main-search" placeholder="Enter search query here" />
+        </div>
+        
+        <!-- Elements with data attributes -->
+        <div>
+            <label>Prompt Input (with data attribute):</label>
+            <textarea data-testid="prompt-textarea" placeholder="Enter your prompt"></textarea>
+        </div>
+        
+        <!-- Elements with aria-label -->
+        <div>
+            <button aria-label="Submit search query" type="submit">Submit</button>
+            <button aria-label="Run the search process">Run Search</button>
+        </div>
+        
+        <!-- Elements with text content -->
+        <div>
+            <button type="button">Search Now</button>
+            <button type="button">Execute Query</button>
+        </div>
+        
+        <!-- Elements with classes -->
+        <div>
+            <input type="text" class="query-input special-input" placeholder="Class-based input" />
+            <button class="primary-btn search-button">Find Results</button>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Test XPath vs CSS Selectors</h2>
+        
+        <div class="results" id="test-results">
+            <p>Test results will appear here...</p>
+        </div>
+        
+        <button onclick="runTests()">Run XPath Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <script>
+        // Copy the functions from automation-script.js for testing
+        function isXPathSelector(selector) {
+          return selector.startsWith('/') || 
+                 selector.startsWith('//') || 
+                 selector.includes('[@') || 
+                 selector.includes('text()') ||
+                 selector.includes('contains(') ||
+                 selector.includes('following-sibling::') ||
+                 selector.includes('preceding-sibling::') ||
+                 selector.includes('ancestor::') ||
+                 selector.includes('descendant::');
+        }
+
+        function findElement(selector) {
+          if (isXPathSelector(selector)) {
+            const result = document.evaluate(
+              selector,
+              document,
+              null,
+              XPathResult.FIRST_ORDERED_NODE_TYPE,
+              null
+            );
+            return result.singleNodeValue;
+          } else {
+            return document.querySelector(selector);
+          }
+        }
+        
+        function runTests() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<h3>Running Tests...</h3>';
+            
+            const testCases = [
+                // CSS selectors
+                { name: 'CSS - ID selector', selector: '#main-search', type: 'CSS' },
+                { name: 'CSS - Data attribute', selector: 'textarea[data-testid="prompt-textarea"]', type: 'CSS' },
+                { name: 'CSS - Aria label', selector: 'button[aria-label*="Submit"]', type: 'CSS' },
+                { name: 'CSS - Class selector', selector: '.query-input', type: 'CSS' },
+                
+                // XPath selectors
+                { name: 'XPath - ID selector', selector: '//*[@id="main-search"]', type: 'XPath' },
+                { name: 'XPath - Data attribute', selector: '//textarea[@data-testid="prompt-textarea"]', type: 'XPath' },
+                { name: 'XPath - Aria label contains', selector: '//button[contains(@aria-label,"Submit")]', type: 'XPath' },
+                { name: 'XPath - Text content', selector: '//button[text()="Search Now"]', type: 'XPath' },
+                { name: 'XPath - Text content 2', selector: '//button[text()="Execute Query"]', type: 'XPath' },
+                { name: 'XPath - Class attribute', selector: '//input[@class="query-input special-input"]', type: 'XPath' },
+                { name: 'XPath - Contains class', selector: '//button[contains(@class,"search-button")]', type: 'XPath' },
+                
+                // Should fail
+                { name: 'Non-existent CSS', selector: '.non-existent', type: 'CSS', shouldFail: true },
+                { name: 'Non-existent XPath', selector: '//div[@class="non-existent"]', type: 'XPath', shouldFail: true }
+            ];
+            
+            let output = '<h3>Test Results:</h3><ul>';
+            
+            testCases.forEach(test => {
+                const detected = isXPathSelector(test.selector) ? 'XPath' : 'CSS';
+                const element = findElement(test.selector);
+                const found = element !== null;
+                
+                let status;
+                if (test.shouldFail) {
+                    status = !found ? '✅ PASS (correctly not found)' : '❌ FAIL (should not exist)';
+                } else {
+                    status = found ? '✅ PASS' : '❌ FAIL';
+                }
+                
+                const typeMatch = detected === test.type ? '✅' : '❌';
+                
+                output += `<li>
+                    <strong>${test.name}</strong><br>
+                    Selector: <code>${test.selector}</code><br>
+                    Type Detection: ${typeMatch} ${detected} (expected ${test.type})<br>
+                    Element Found: ${status}<br>
+                    ${found ? `Element: ${element.tagName} ${element.id ? '#' + element.id : ''} ${element.className ? '.' + element.className.split(' ').join('.') : ''}` : ''}
+                </li><br>`;
+            });
+            
+            output += '</ul>';
+            results.innerHTML = output;
+        }
+        
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '<p>Test results will appear here...</p>';
+        }
+        
+        // Automatically run tests when page loads
+        window.addEventListener('load', () => {
+            console.log('XPath Test Page loaded - you can run tests manually or they will run automatically');
+            setTimeout(runTests, 1000);
+        });
+    </script>
+</body>
+</html>
