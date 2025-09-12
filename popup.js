@@ -877,7 +877,8 @@ async function selectElement(elementType) {
         
         const originalText = button.textContent;
         button.disabled = true;
-        button.textContent = 'Click on page...';
+        button.textContent = '🔄 Switch to website tab...';
+        button.style.background = '#ff6b35';
 
         try {
             // Send message to content script to start element selection
@@ -886,16 +887,39 @@ async function selectElement(elementType) {
                 type: elementType
             });
 
-            if (result && result.selector) {
+            if (result && (result.selector || result.cssSelector || result.xpathSelector)) {
+                // Get user's selector type preference
+                const selectorTypeRadios = document.querySelectorAll('input[name="selector-type"]');
+                let preferredType = 'xpath'; // Default to XPath as requested in issue #5
+                
+                for (const radio of selectorTypeRadios) {
+                    if (radio.checked) {
+                        preferredType = radio.value;
+                        break;
+                    }
+                }
+                
+                // Choose the appropriate selector based on user preference
+                let selectedSelector;
+                if (preferredType === 'xpath' && result.xpathSelector) {
+                    selectedSelector = result.xpathSelector;
+                } else if (preferredType === 'css' && result.cssSelector) {
+                    selectedSelector = result.cssSelector;
+                } else {
+                    // Fallback: use whatever is available
+                    selectedSelector = result.selector || result.xpathSelector || result.cssSelector;
+                }
+                
                 // Fill in the selector field
                 const selectorField = elementType === 'input' ? 
                     document.getElementById('input-selector') : 
                     document.getElementById('button-selector');
                 
-                selectorField.value = result.selector;
+                selectorField.value = selectedSelector;
                 
-                // Show success feedback
-                showSuccessFeedback(`Selected ${elementType} element: ${result.description}`);
+                // Show success feedback with selector type info
+                const selectorTypeText = preferredType === 'xpath' ? 'XPath' : 'CSS';
+                showSuccessFeedback(`Selected ${elementType} element (${selectorTypeText}): ${result.description}`);
             } else if (result === null) {
                 // User cancelled
                 console.log('Element selection cancelled');
@@ -914,6 +938,7 @@ async function selectElement(elementType) {
         // Re-enable the button
         button.disabled = false;
         button.textContent = originalText;
+        button.style.background = ''; // Reset to default
 
     } catch (error) {
         console.error('Error in selectElement:', error);

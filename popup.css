@@ -727,10 +727,41 @@ form {
 /* Element Selector Styles */
 .element-selector-section {
     margin-top: 16px;
-    padding: 16px;
+    padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e1e5e9;
+}
+
+.selector-preference {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.selector-preference label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.radio-group {
+    display: flex;
+    gap: 16px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+    margin: 0;
 }
 
 .element-selector-row {
@@ -770,29 +801,83 @@ form {
     background-color: #4285f4;
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 10px 16px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 500;
     white-space: nowrap;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(66, 133, 244, 0.2);
 }
 
 .btn-select:hover {
     background-color: #3367d6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
 }
 
 .btn-select:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .selector-help {
-    background-color: #e8f0fe;
-    padding: 12px;
-    border-radius: 6px;
+    background: linear-gradient(135deg, #e8f0fe 0%, #f3f7ff 100%);
+    padding: 16px;
+    border-radius: 8px;
     border-left: 4px solid #4285f4;
-    margin-top: 8px;
+    margin-top: 16px;
+}
+
+.help-header {
+    color: #1a73e8;
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.help-steps {
+    margin-bottom: 12px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #333;
+}
+
+.step:last-child {
+    margin-bottom: 0;
+}
+
+.step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #4285f4;
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.help-tip {
+    padding: 8px 12px;
+    background-color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #555;
+    border-left: 3px solid #34a853;
+}
 }
 
 .selector-help p {
