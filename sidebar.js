@@ -692,12 +692,14 @@ input:checked + .omnisearch-toggle-slider:before {
 
     // Create sidebar HTML
     function createSidebarHTML() {
+        const logoIconUrl = typeof chrome !== 'undefined' && chrome.runtime ? chrome.runtime.getURL('icons/icon48.png') : './icons/icon48.png';
+        
         return `
             <div id="omnisearch-sidebar" class="omnisearch-sidebar-hidden">
                 <div class="omnisearch-sidebar-content">
                     <div class="omnisearch-header">
                         <div class="omnisearch-logo">
-                            <img src="${chrome.runtime.getURL('icons/icon48.png')}" alt="OmniSearch" class="omnisearch-logo-icon">
+                            <img src="${logoIconUrl}" alt="OmniSearch" class="omnisearch-logo-icon">
                             <h1>OmniSearch</h1>
                         </div>
                         <button class="omnisearch-close-btn" id="omnisearch-close-btn">&times;</button>
@@ -847,6 +849,61 @@ input:checked + .omnisearch-toggle-slider:before {
         if (addAdvancedBtn) {
             addAdvancedBtn.addEventListener('click', () => addNewShortcut('advanced'));
         }
+
+        // Event delegation for shortcut actions (edit, delete, toggle)
+        const shortcutsList = document.getElementById('omnisearch-shortcuts-list');
+        if (shortcutsList) {
+            shortcutsList.addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                const keyword = e.target.dataset.keyword;
+                
+                if (action && keyword) {
+                    switch (action) {
+                        case 'edit':
+                            editShortcut(keyword);
+                            break;
+                        case 'delete':
+                            deleteShortcut(keyword);
+                            break;
+                    }
+                }
+            });
+
+            shortcutsList.addEventListener('change', (e) => {
+                if (e.target.type === 'checkbox' && e.target.dataset.action === 'toggle') {
+                    const keyword = e.target.dataset.keyword;
+                    if (keyword) {
+                        toggleShortcut(keyword);
+                    }
+                }
+            });
+        }
+
+        // Global event delegation for modal actions
+        document.addEventListener('click', (e) => {
+            const action = e.target.dataset.action;
+            if (action) {
+                switch (action) {
+                    case 'close-modal':
+                        closeModal(e.target);
+                        break;
+                    case 'save-simple-edit':
+                        const originalKeyword = e.target.dataset.originalKeyword;
+                        saveSimpleEdit(originalKeyword, e.target);
+                        break;
+                    case 'save-advanced-edit':
+                        const originalKeywordAdv = e.target.dataset.originalKeyword;
+                        saveAdvancedEdit(originalKeywordAdv, e.target);
+                        break;
+                    case 'save-new-simple':
+                        saveNewSimple(e.target);
+                        break;
+                    case 'save-new-advanced':
+                        saveNewAdvanced(e.target);
+                        break;
+                }
+            }
+        });
     }
 
     // Open sidebar
@@ -912,13 +969,53 @@ input:checked + .omnisearch-toggle-slider:before {
 
     // Load shortcuts from background script
     function loadShortcuts() {
-        chrome.runtime.sendMessage({ action: 'getShortcuts' }, (response) => {
-            if (response && response.shortcuts) {
-                shortcuts = response.shortcuts;
-                renderShortcuts();
-                renderKeywordsHelp();
-            }
-        });
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+            chrome.runtime.sendMessage({ action: 'getShortcuts' }, (response) => {
+                if (response && response.shortcuts) {
+                    shortcuts = response.shortcuts;
+                    renderShortcuts();
+                    renderKeywordsHelp();
+                }
+            });
+        } else {
+            // For testing environments, use mock data
+            console.log('Loading mock shortcuts for testing');
+            shortcuts = {
+                'ai': {
+                    name: 'AI Studio',
+                    keyword: 'ai',
+                    type: 'advanced',
+                    url: 'https://aistudio.google.com/prompts/new_chat',
+                    inputSelector: 'textarea',
+                    buttonSelector: 'button[aria-label*="Run"]:not([disabled])',
+                    enabled: true,
+                    icon: 'https://www.gstatic.com/a/images/brand/project-wordmark/bard-64.png'
+                },
+                'youtube': {
+                    name: 'YouTube',
+                    url: 'https://www.youtube.com/results?search_query=%s',
+                    enabled: true,
+                    type: 'simple',
+                    icon: 'https://www.youtube.com/favicon.ico'
+                },
+                'drive': {
+                    name: 'Google Drive',
+                    url: 'https://drive.google.com/drive/search?q=%s',
+                    enabled: true,
+                    type: 'simple',
+                    icon: 'https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png'
+                },
+                'gmail': {
+                    name: 'Gmail',
+                    url: 'https://mail.google.com/mail/u/0/#search/%s',
+                    enabled: false,
+                    type: 'simple',
+                    icon: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico'
+                }
+            };
+            renderShortcuts();
+            renderKeywordsHelp();
+        }
     }
 
     // Render shortcuts list
@@ -938,11 +1035,16 @@ input:checked + .omnisearch-toggle-slider:before {
     function createShortcutElement(keyword, shortcut) {
         const div = document.createElement('div');
         div.className = `omnisearch-shortcut-item${shortcut.type === 'advanced' ? ' omnisearch-advanced-shortcut' : ''}`;
+        div.dataset.keyword = keyword; // Store keyword in data attribute
 
         const typeLabel = shortcut.type === 'advanced' ? 'Advanced' : 'Simple';
         
+        // Get icon URL with fallback
+        const iconUrl = shortcut.icon || (typeof chrome !== 'undefined' && chrome.runtime ? chrome.runtime.getURL('icons/icon16.png') : './icons/icon16.png');
+        const fallbackIcon = typeof chrome !== 'undefined' && chrome.runtime ? chrome.runtime.getURL('icons/icon16.png') : './icons/icon16.png';
+        
         div.innerHTML = `
-            <img src="${shortcut.icon || chrome.runtime.getURL('icons/icon16.png')}" alt="${shortcut.name}" class="omnisearch-shortcut-icon" onerror="this.src='${chrome.runtime.getURL('icons/icon16.png')}'">
+            <img src="${iconUrl}" alt="${shortcut.name}" class="omnisearch-shortcut-icon" onerror="this.src='${fallbackIcon}'">
             <div class="omnisearch-shortcut-info">
                 <div class="omnisearch-shortcut-name">${shortcut.name}</div>
                 <div class="omnisearch-shortcut-keyword">${keyword}</div>
@@ -950,11 +1052,11 @@ input:checked + .omnisearch-toggle-slider:before {
             </div>
             <div class="omnisearch-shortcut-actions">
                 <label class="omnisearch-toggle-switch">
-                    <input type="checkbox" ${shortcut.enabled ? 'checked' : ''} onchange="toggleShortcut('${keyword}')">
+                    <input type="checkbox" ${shortcut.enabled ? 'checked' : ''} data-action="toggle" data-keyword="${keyword}">
                     <span class="omnisearch-toggle-slider"></span>
                 </label>
-                <button class="omnisearch-btn omnisearch-btn-edit" onclick="editShortcut('${keyword}')">Edit</button>
-                <button class="omnisearch-btn omnisearch-btn-danger" onclick="deleteShortcut('${keyword}')">Delete</button>
+                <button class="omnisearch-btn omnisearch-btn-edit" data-action="edit" data-keyword="${keyword}">Edit</button>
+                <button class="omnisearch-btn omnisearch-btn-danger" data-action="delete" data-keyword="${keyword}">Delete</button>
             </div>
         `;
 
@@ -1019,15 +1121,21 @@ input:checked + .omnisearch-toggle-slider:before {
 
     // Save shortcuts to background script
     function saveShortcuts() {
-        chrome.runtime.sendMessage({
-            action: 'updateShortcuts',
-            shortcuts: shortcuts
-        }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error('Error saving shortcuts:', chrome.runtime.lastError);
-                showNotification('Failed to save changes', 'error');
-            }
-        });
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+            chrome.runtime.sendMessage({
+                action: 'updateShortcuts',
+                shortcuts: shortcuts
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error('Error saving shortcuts:', chrome.runtime.lastError);
+                    showNotification('Failed to save changes', 'error');
+                }
+            });
+        } else {
+            // For testing environments, just log the action
+            console.log('Mock save shortcuts:', shortcuts);
+            showNotification('Changes saved (test mode)', 'success');
+        }
     }
 
     // Show notification
@@ -1101,8 +1209,8 @@ input:checked + .omnisearch-toggle-slider:before {
                     </div>
                 </div>
                 <div class="omnisearch-modal-footer">
-                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
-                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveSimpleEdit('${keyword}', this)">Save</button>
+                    <button class="omnisearch-btn omnisearch-btn-secondary" data-action="close-modal">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-simple-edit" data-original-keyword="${keyword}">Save</button>
                 </div>
             </div>
         `;
@@ -1157,8 +1265,8 @@ input:checked + .omnisearch-toggle-slider:before {
                     </div>
                 </div>
                 <div class="omnisearch-modal-footer">
-                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
-                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveAdvancedEdit('${keyword}', this)">Save</button>
+                    <button class="omnisearch-btn omnisearch-btn-secondary" data-action="close-modal">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-advanced-edit" data-original-keyword="${keyword}">Save</button>
                 </div>
             </div>
         `;
@@ -1320,8 +1428,8 @@ input:checked + .omnisearch-toggle-slider:before {
                     </div>
                 </div>
                 <div class="omnisearch-modal-footer">
-                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
-                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveNewSimple(this)">Add Shortcut</button>
+                    <button class="omnisearch-btn omnisearch-btn-secondary" data-action="close-modal">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-new-simple">Add Shortcut</button>
                 </div>
             </div>
         `;
@@ -1376,8 +1484,8 @@ input:checked + .omnisearch-toggle-slider:before {
                     </div>
                 </div>
                 <div class="omnisearch-modal-footer">
-                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
-                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveNewAdvanced(this)">Add Shortcut</button>
+                    <button class="omnisearch-btn omnisearch-btn-secondary" data-action="close-modal">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-new-advanced">Add Shortcut</button>
                 </div>
             </div>
         `;
@@ -1485,25 +1593,19 @@ input:checked + .omnisearch-toggle-slider:before {
         showNotification(`Added advanced "${name}" shortcut successfully`, 'success');
     }
 
-    // Make functions globally available for onclick handlers
-    window.toggleShortcut = toggleShortcut;
-    window.editShortcut = editShortcut;
-    window.deleteShortcut = deleteShortcut;
-    window.closeModal = closeModal;
-    window.saveSimpleEdit = saveSimpleEdit;
-    window.saveAdvancedEdit = saveAdvancedEdit;
-    window.saveNewSimple = saveNewSimple;
-    window.saveNewAdvanced = saveNewAdvanced;
+    // Note: Using event delegation instead of global functions for better encapsulation
 
     // Listen for messages from background script
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        if (request.action === 'toggleSidebar') {
-            toggleSidebar();
-        } else if (request.action === 'openSidebar') {
-            openSidebar();
-        } else if (request.action === 'closeSidebar') {
-            closeSidebar();
-        }
-    });
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.action === 'toggleSidebar') {
+                toggleSidebar();
+            } else if (request.action === 'openSidebar') {
+                openSidebar();
+            } else if (request.action === 'closeSidebar') {
+                closeSidebar();
+            }
+        });
+    }
 
 })();
