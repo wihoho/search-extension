@@ -13,7 +13,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const performAutomation = async () => {
       try {
         // Step 1: Wait for the textbox to exist on the page
-        console.log(`OmniSearch: Waiting for input element: "${inputSelector}"`);
+        const inputSelectorType = isXPathSelector(inputSelector) ? 'XPath' : 'CSS';
+        console.log(`OmniSearch: Waiting for input element (${inputSelectorType}): "${inputSelector}"`);
         const inputField = await waitForElement(inputSelector);
         console.log('OmniSearch: Found input field.', inputField);
 
@@ -24,7 +25,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('OmniSearch: Injected query into input field.');
 
         // Step 3: Wait for the submit button to exist
-        console.log(`OmniSearch: Waiting for button element: "${buttonSelector}"`);
+        const buttonSelectorType = isXPathSelector(buttonSelector) ? 'XPath' : 'CSS';
+        console.log(`OmniSearch: Waiting for button element (${buttonSelectorType}): "${buttonSelector}"`);
         const submitButton = await waitForElement(buttonSelector);
         console.log('OmniSearch: Found submit button.', submitButton);
 
@@ -45,19 +47,55 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 /**
+ * Detects if a selector is XPath or CSS selector
+ */
+function isXPathSelector(selector) {
+  // XPath selectors typically start with / or // or contain XPath-specific syntax
+  return selector.startsWith('/') || 
+         selector.startsWith('//') || 
+         selector.includes('[@') || 
+         selector.includes('text()') ||
+         selector.includes('contains(') ||
+         selector.includes('following-sibling::') ||
+         selector.includes('preceding-sibling::') ||
+         selector.includes('ancestor::') ||
+         selector.includes('descendant::');
+}
+
+/**
+ * Finds an element using either CSS selector or XPath
+ */
+function findElement(selector) {
+  if (isXPathSelector(selector)) {
+    // Use XPath
+    const result = document.evaluate(
+      selector,
+      document,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null
+    );
+    return result.singleNodeValue;
+  } else {
+    // Use CSS selector
+    return document.querySelector(selector);
+  }
+}
+
+/**
  * A robust function to wait for an element to appear in the DOM.
  * This is essential for modern web apps that load content dynamically.
- * This pattern is extracted from your example code.
+ * Supports both CSS selectors and XPath expressions.
  */
 function waitForElement(selector) {
   return new Promise(resolve => {
-    const element = document.querySelector(selector);
+    const element = findElement(selector);
     if (element) {
       return resolve(element);
     }
 
     const observer = new MutationObserver(mutations => {
-      const targetElement = document.querySelector(selector);
+      const targetElement = findElement(selector);
       if (targetElement) {
         resolve(targetElement);
         observer.disconnect();

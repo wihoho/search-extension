@@ -118,6 +118,69 @@ function generateSelector(element) {
   }
 }
 
+// Generate XPath selector for an element
+function generateXPathSelector(element) {
+  // Try to generate a reliable XPath
+  
+  // Try ID first
+  if (element.id) {
+    const xpath = `//*[@id='${element.id}']`;
+    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    if (result.singleNodeValue === element) {
+      return xpath;
+    }
+  }
+  
+  // Try unique attributes
+  const attributes = ['data-testid', 'data-test', 'name', 'placeholder', 'aria-label'];
+  for (const attr of attributes) {
+    const value = element.getAttribute(attr);
+    if (value) {
+      const xpath = `//${element.tagName.toLowerCase()}[@${attr}='${value}']`;
+      const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      if (result.singleNodeValue === element) {
+        return xpath;
+      }
+    }
+  }
+  
+  // Try text content for buttons and links
+  if (['button', 'a', 'span'].includes(element.tagName.toLowerCase())) {
+    const text = element.textContent?.trim();
+    if (text && text.length > 0 && text.length < 50) {
+      const xpath = `//${element.tagName.toLowerCase()}[text()='${text}']`;
+      const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      if (result.singleNodeValue === element) {
+        return xpath;
+      }
+      
+      // Try contains for partial text match
+      const containsXpath = `//${element.tagName.toLowerCase()}[contains(text(),'${text}')]`;
+      const containsResult = document.evaluate(containsXpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      if (containsResult.snapshotLength === 1 && containsResult.snapshotItem(0) === element) {
+        return containsXpath;
+      }
+    }
+  }
+  
+  // Fallback to positional XPath
+  const getElementIndex = (el) => {
+    let index = 1;
+    let sibling = el.previousElementSibling;
+    while (sibling) {
+      if (sibling.tagName === el.tagName) {
+        index++;
+      }
+      sibling = sibling.previousElementSibling;
+    }
+    return index;
+  };
+  
+  const tagName = element.tagName.toLowerCase();
+  const index = getElementIndex(element);
+  return `//${tagName}[${index}]`;
+}
+
 // Get element description for display
 function getElementDescription(element) {
   const tagName = element.tagName.toLowerCase();
@@ -238,14 +301,17 @@ function handleClick(event) {
     return;
   }
   
-  const selector = generateSelector(element);
+  const cssSelector = generateSelector(element);
+  const xpathSelector = generateXPathSelector(element);
   const description = getElementDescription(element);
   
-  console.log('Element selected:', { element, selector, description });
+  console.log('Element selected:', { element, cssSelector, xpathSelector, description });
   
   if (selectionCallback) {
     selectionCallback({
-      selector: selector,
+      cssSelector: cssSelector,
+      xpathSelector: xpathSelector,
+      selector: cssSelector, // Default to CSS for backward compatibility
       description: description,
       tagName: element.tagName.toLowerCase(),
       element: element
