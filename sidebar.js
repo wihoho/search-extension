@@ -1,4 +1,4 @@
-// OmniSearch Sidebar Script
+// OmniSearch Sidebar Script - Simplified and Reliable
 // Injects and manages the sidebar interface on web pages
 
 (function() {
@@ -13,6 +13,421 @@
     let sidebarContainer = null;
     let isOpen = false;
     let shortcuts = {};
+
+    // Complete CSS as a string - this ensures it's always available
+    const COMPLETE_CSS = `
+/* OmniSearch Sidebar Styles - Complete Inline */
+
+/* Body transition for smooth page shifting */
+body.omnisearch-sidebar-open {
+    margin-right: 400px !important;
+    transition: margin-right 0.3s ease-in-out !important;
+}
+
+@media (max-width: 768px) {
+    body.omnisearch-sidebar-open {
+        margin-right: 320px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body.omnisearch-sidebar-open {
+        margin-right: 0 !important;
+    }
+}
+
+/* Sidebar Container */
+#omnisearch-sidebar-container {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 0 !important;
+    height: 100vh !important;
+    z-index: 2147483647 !important;
+    pointer-events: none !important;
+}
+
+/* Sidebar */
+#omnisearch-sidebar {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 400px !important;
+    height: 100vh !important;
+    background: #ffffff !important;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1) !important;
+    transform: translateX(100%) !important;
+    transition: transform 0.3s ease-in-out !important;
+    pointer-events: auto !important;
+    overflow: hidden !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    color: #333 !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#omnisearch-sidebar.omnisearch-sidebar-visible {
+    transform: translateX(0) !important;
+}
+
+#omnisearch-sidebar.omnisearch-sidebar-hidden {
+    transform: translateX(100%) !important;
+}
+
+/* Sidebar Content */
+.omnisearch-sidebar-content {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* Header */
+.omnisearch-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 20px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    flex-shrink: 0 !important;
+}
+
+.omnisearch-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.omnisearch-logo-icon {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.omnisearch-logo h1 {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    color: white !important;
+}
+
+.omnisearch-close-btn {
+    background: none !important;
+    border: none !important;
+    color: white !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    transition: background-color 0.2s !important;
+}
+
+.omnisearch-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Tabs */
+.omnisearch-tabs {
+    display: flex !important;
+    background: #f8f9fa !important;
+    border-bottom: 1px solid #e9ecef !important;
+    flex-shrink: 0 !important;
+}
+
+.omnisearch-tab-button {
+    flex: 1 !important;
+    padding: 12px 16px !important;
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #6c757d !important;
+    transition: all 0.2s !important;
+}
+
+.omnisearch-tab-button:hover {
+    background: #e9ecef !important;
+    color: #495057 !important;
+}
+
+.omnisearch-tab-button.omnisearch-active {
+    background: white !important;
+    color: #667eea !important;
+    border-bottom: 2px solid #667eea !important;
+}
+
+/* Tab Content */
+.omnisearch-tab-content {
+    flex: 1 !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+}
+
+.omnisearch-tab-content.omnisearch-hidden {
+    display: none !important;
+}
+
+/* Sections */
+.omnisearch-section {
+    margin-bottom: 24px !important;
+}
+
+.omnisearch-section:last-child {
+    margin-bottom: 0 !important;
+}
+
+.omnisearch-section h2 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-bottom: 12px !important;
+    color: #333 !important;
+}
+
+.omnisearch-section-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 12px !important;
+}
+
+/* Quick Start */
+.omnisearch-quick-start {
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    border-left: 4px solid #667eea !important;
+}
+
+.omnisearch-step {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 8px !important;
+}
+
+.omnisearch-step:last-child {
+    margin-bottom: 0 !important;
+}
+
+.omnisearch-step-number {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    background: #667eea !important;
+    color: white !important;
+    border-radius: 50% !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    flex-shrink: 0 !important;
+}
+
+.omnisearch-step code {
+    background: #e9ecef !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: 'Monaco', 'Consolas', monospace !important;
+    font-size: 12px !important;
+}
+
+.omnisearch-step kbd {
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    padding: 2px 6px !important;
+    font-family: inherit !important;
+    font-size: 12px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+}
+
+/* Shortcuts List */
+.omnisearch-shortcuts-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.omnisearch-shortcut-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 12px !important;
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    border: 1px solid #e9ecef !important;
+    transition: all 0.2s !important;
+}
+
+.omnisearch-shortcut-item:hover {
+    background: #e9ecef !important;
+}
+
+.omnisearch-shortcut-icon {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 12px !important;
+    border-radius: 4px !important;
+}
+
+.omnisearch-shortcut-info {
+    flex: 1 !important;
+}
+
+.omnisearch-shortcut-name {
+    font-weight: 500 !important;
+    color: #333 !important;
+    margin-bottom: 2px !important;
+}
+
+.omnisearch-shortcut-keyword {
+    font-size: 12px !important;
+    color: #6c757d !important;
+    font-family: 'Monaco', 'Consolas', monospace !important;
+}
+
+.omnisearch-shortcut-actions {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+/* Buttons */
+.omnisearch-btn {
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.omnisearch-btn-primary {
+    background: #667eea !important;
+    color: white !important;
+}
+
+.omnisearch-btn-primary:hover {
+    background: #5a6fd8 !important;
+}
+
+.omnisearch-btn-secondary {
+    background: #6c757d !important;
+    color: white !important;
+}
+
+.omnisearch-btn-secondary:hover {
+    background: #5a6268 !important;
+}
+
+/* Help Content */
+.omnisearch-help-content {
+    line-height: 1.6 !important;
+}
+
+.omnisearch-help-item {
+    margin-bottom: 20px !important;
+}
+
+.omnisearch-help-item h3 {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    color: #333 !important;
+}
+
+.omnisearch-help-item ul {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 0 !important;
+}
+
+.omnisearch-help-item li {
+    padding: 4px 0 !important;
+    padding-left: 16px !important;
+    position: relative !important;
+}
+
+.omnisearch-help-item li:before {
+    content: "→" !important;
+    position: absolute !important;
+    left: 0 !important;
+    color: #667eea !important;
+    font-weight: bold !important;
+}
+
+.omnisearch-keywords-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+}
+
+.omnisearch-keyword-item {
+    background: #f8f9fa !important;
+    padding: 8px !important;
+    border-radius: 6px !important;
+    text-align: center !important;
+    border: 1px solid #e9ecef !important;
+}
+
+.omnisearch-keyword-item code {
+    display: block !important;
+    margin-bottom: 4px !important;
+    font-weight: 600 !important;
+    background: #e9ecef !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: 'Monaco', 'Consolas', monospace !important;
+    font-size: 12px !important;
+}
+
+.omnisearch-keyword-item small {
+    color: #6c757d !important;
+    font-size: 11px !important;
+}
+
+/* Reset all potential inherited styles */
+#omnisearch-sidebar * {
+    box-sizing: border-box !important;
+    font-family: inherit !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #omnisearch-sidebar {
+        width: 320px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #omnisearch-sidebar {
+        width: 100vw !important;
+    }
+}
+    `;
+
+    // Inject CSS immediately
+    function injectCSS() {
+        if (document.getElementById('omnisearch-sidebar-styles-complete')) {
+            return; // Already injected
+        }
+        
+        const style = document.createElement('style');
+        style.id = 'omnisearch-sidebar-styles-complete';
+        style.textContent = COMPLETE_CSS;
+        document.head.appendChild(style);
+        
+        console.log('OmniSearch: CSS injected successfully');
+    }
 
     // Create sidebar HTML
     function createSidebarHTML() {
@@ -90,37 +505,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Add Custom Shortcut Modal -->
-                <div class="omnisearch-modal omnisearch-hidden" id="omnisearch-add-shortcut-modal">
-                    <div class="omnisearch-modal-content">
-                        <div class="omnisearch-modal-header">
-                            <h3 id="omnisearch-modal-title">Add Custom Shortcut</h3>
-                            <button class="omnisearch-close-btn" id="omnisearch-close-modal">&times;</button>
-                        </div>
-                        <form id="omnisearch-shortcut-form">
-                            <div class="omnisearch-form-group">
-                                <label for="omnisearch-shortcut-keyword">Keyword</label>
-                                <input type="text" id="omnisearch-shortcut-keyword" placeholder="e.g., reddit" required>
-                                <small>Short, memorable keyword to trigger the search</small>
-                            </div>
-                            <div class="omnisearch-form-group">
-                                <label for="omnisearch-shortcut-name">Website Name</label>
-                                <input type="text" id="omnisearch-shortcut-name" placeholder="e.g., Reddit" required>
-                            </div>
-                            <div class="omnisearch-form-group">
-                                <label for="omnisearch-shortcut-url">Search URL</label>
-                                <input type="url" id="omnisearch-shortcut-url" placeholder="https://www.reddit.com/search/?q=%s" required>
-                                <small>Use %s where the search query should be inserted</small>
-                            </div>
-                            
-                            <div class="omnisearch-form-actions">
-                                <button type="button" class="omnisearch-btn omnisearch-btn-secondary" id="omnisearch-cancel-btn">Cancel</button>
-                                <button type="submit" class="omnisearch-btn omnisearch-btn-primary" id="omnisearch-save-btn">Save</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
             </div>
         `;
     }
@@ -131,13 +515,13 @@
             return; // Already injected
         }
 
+        // Inject CSS first
+        injectCSS();
+        
         // Create container
         sidebarContainer = document.createElement('div');
         sidebarContainer.id = 'omnisearch-sidebar-container';
         sidebarContainer.innerHTML = createSidebarHTML();
-        
-        // Inject CSS
-        injectCSS();
         
         // Add to page
         document.body.appendChild(sidebarContainer);
@@ -147,30 +531,14 @@
         
         // Load shortcuts
         loadShortcuts();
-    }
-
-    // Inject CSS styles
-    function injectCSS() {
-        if (document.getElementById('omnisearch-sidebar-styles')) {
-            return; // Already injected
-        }
-
-        const link = document.createElement('link');
-        link.id = 'omnisearch-sidebar-styles';
-        link.rel = 'stylesheet';
-        link.href = chrome.runtime.getURL('sidebar.css');
-        document.head.appendChild(link);
+        
+        console.log('OmniSearch: Sidebar injected successfully');
     }
 
     // Setup event listeners for sidebar
     function setupSidebarEventListeners() {
         const sidebar = document.getElementById('omnisearch-sidebar');
         const closeBtn = document.getElementById('omnisearch-close-btn');
-        const addShortcutBtn = document.getElementById('omnisearch-add-shortcut-btn');
-        const modal = document.getElementById('omnisearch-add-shortcut-modal');
-        const closeModalBtn = document.getElementById('omnisearch-close-modal');
-        const cancelBtn = document.getElementById('omnisearch-cancel-btn');
-        const shortcutForm = document.getElementById('omnisearch-shortcut-form');
 
         // Close sidebar
         closeBtn.addEventListener('click', closeSidebar);
@@ -182,21 +550,6 @@
                 const tabName = button.dataset.tab;
                 switchTab(tabName);
             });
-        });
-
-        // Add shortcut
-        addShortcutBtn.addEventListener('click', openModal);
-
-        // Modal controls
-        closeModalBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
-        shortcutForm.addEventListener('submit', handleFormSubmit);
-
-        // Close modal on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
         });
 
         // Prevent sidebar from closing when clicking inside
@@ -229,10 +582,16 @@
         const sidebar = document.getElementById('omnisearch-sidebar');
         sidebar.classList.remove('omnisearch-sidebar-hidden');
         sidebar.classList.add('omnisearch-sidebar-visible');
+        
+        // Add body class to shift page content
+        document.body.classList.add('omnisearch-sidebar-open');
+        
         isOpen = true;
         
         // Refresh shortcuts when opening
         loadShortcuts();
+        
+        console.log('OmniSearch: Sidebar opened');
     }
 
     // Close sidebar
@@ -242,7 +601,13 @@
             sidebar.classList.remove('omnisearch-sidebar-visible');
             sidebar.classList.add('omnisearch-sidebar-hidden');
         }
+        
+        // Remove body class to restore page content
+        document.body.classList.remove('omnisearch-sidebar-open');
+        
         isOpen = false;
+        
+        console.log('OmniSearch: Sidebar closed');
     }
 
     // Toggle sidebar
@@ -304,21 +669,7 @@
                 <div class="omnisearch-shortcut-name">${shortcut.name}</div>
                 <div class="omnisearch-shortcut-keyword">${keyword}</div>
             </div>
-            <div class="omnisearch-shortcut-actions">
-                <label class="omnisearch-toggle-switch">
-                    <input type="checkbox" ${shortcut.enabled ? 'checked' : ''}>
-                    <span class="omnisearch-toggle-slider"></span>
-                </label>
-                <button class="omnisearch-btn omnisearch-btn-edit" onclick="editShortcut('${keyword}')">Edit</button>
-                <button class="omnisearch-btn omnisearch-btn-danger" onclick="deleteShortcut('${keyword}')">Delete</button>
-            </div>
         `;
-
-        // Add toggle functionality
-        const toggle = div.querySelector('input[type="checkbox"]');
-        toggle.addEventListener('change', () => {
-            toggleShortcut(keyword);
-        });
 
         return div;
     }
@@ -342,109 +693,6 @@
             }
         });
     }
-
-    // Modal functions
-    function openModal() {
-        const modal = document.getElementById('omnisearch-add-shortcut-modal');
-        modal.classList.remove('omnisearch-hidden');
-    }
-
-    function closeModal() {
-        const modal = document.getElementById('omnisearch-add-shortcut-modal');
-        modal.classList.add('omnisearch-hidden');
-        
-        // Reset form
-        const form = document.getElementById('omnisearch-shortcut-form');
-        form.reset();
-    }
-
-    // Handle form submission
-    function handleFormSubmit(e) {
-        e.preventDefault();
-        
-        const keyword = document.getElementById('omnisearch-shortcut-keyword').value.trim();
-        const name = document.getElementById('omnisearch-shortcut-name').value.trim();
-        const url = document.getElementById('omnisearch-shortcut-url').value.trim();
-
-        if (!keyword || !name || !url) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        if (!url.includes('%s')) {
-            alert('URL must contain %s placeholder for the search term');
-            return;
-        }
-
-        // Add shortcut
-        const newShortcut = {
-            name: name,
-            url: url,
-            enabled: true,
-            icon: null
-        };
-
-        shortcuts[keyword] = newShortcut;
-        
-        // Save to storage
-        chrome.runtime.sendMessage({
-            action: 'updateShortcuts',
-            shortcuts: shortcuts
-        }, (response) => {
-            if (response && response.success) {
-                renderShortcuts();
-                renderKeywordsHelp();
-                closeModal();
-            } else {
-                alert('Failed to save shortcut');
-            }
-        });
-    }
-
-    // Shortcut management functions (global scope)
-    window.toggleShortcut = function(keyword) {
-        if (shortcuts[keyword]) {
-            shortcuts[keyword].enabled = !shortcuts[keyword].enabled;
-            
-            chrome.runtime.sendMessage({
-                action: 'updateShortcuts',
-                shortcuts: shortcuts
-            }, (response) => {
-                if (response && response.success) {
-                    renderKeywordsHelp();
-                }
-            });
-        }
-    };
-
-    window.editShortcut = function(keyword) {
-        // Simple edit - just show current values
-        const shortcut = shortcuts[keyword];
-        if (shortcut) {
-            document.getElementById('omnisearch-modal-title').textContent = 'Edit Shortcut';
-            document.getElementById('omnisearch-shortcut-keyword').value = keyword;
-            document.getElementById('omnisearch-shortcut-name').value = shortcut.name;
-            document.getElementById('omnisearch-shortcut-url').value = shortcut.url;
-            openModal();
-        }
-    };
-
-    window.deleteShortcut = function(keyword) {
-        const shortcut = shortcuts[keyword];
-        if (shortcut && confirm(`Delete "${shortcut.name}" shortcut?`)) {
-            delete shortcuts[keyword];
-            
-            chrome.runtime.sendMessage({
-                action: 'updateShortcuts',
-                shortcuts: shortcuts
-            }, (response) => {
-                if (response && response.success) {
-                    renderShortcuts();
-                    renderKeywordsHelp();
-                }
-            });
-        }
-    };
 
     // Listen for messages from background script
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

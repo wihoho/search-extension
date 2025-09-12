@@ -1,5 +1,23 @@
 /* OmniSearch Sidebar Styles */
 
+/* Body transition for smooth page shifting */
+body.omnisearch-sidebar-open {
+    margin-right: 400px !important;
+    transition: margin-right 0.3s ease-in-out !important;
+}
+
+@media (max-width: 768px) {
+    body.omnisearch-sidebar-open {
+        margin-right: 320px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body.omnisearch-sidebar-open {
+        margin-right: 0 !important;
+    }
+}
+
 /* Sidebar Container */
 #omnisearch-sidebar-container {
     position: fixed !important;
