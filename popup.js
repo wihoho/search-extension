@@ -218,10 +218,8 @@ function createShortcutElement(keyword, shortcut) {
                 <input type="checkbox" ${shortcut.enabled ? 'checked' : ''}>
                 <span class="toggle-slider"></span>
             </label>
-            ${isCustom ? `
-                <button class="btn btn-edit" data-keyword="${keyword}">Edit</button>
-                <button class="btn btn-danger" data-keyword="${keyword}">Delete</button>
-            ` : ''}
+            <button class="btn btn-edit" data-keyword="${keyword}">Edit</button>
+            <button class="btn btn-danger" data-keyword="${keyword}">Delete</button>
         </div>
     `;
 
@@ -234,27 +232,25 @@ function createShortcutElement(keyword, shortcut) {
         });
     }
 
-    if (isCustom) {
-        const editBtn = div.querySelector('.btn-edit');
-        const deleteBtn = div.querySelector('.btn-danger');
+    const editBtn = div.querySelector('.btn-edit');
+    const deleteBtn = div.querySelector('.btn-danger');
 
-        if (editBtn) {
-            editBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Edit button clicked for:', keyword);
-                editShortcut(keyword);
-            });
-        }
+    if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Edit button clicked for:', keyword);
+            editShortcut(keyword);
+        });
+    }
 
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Delete button clicked for:', keyword);
-                deleteShortcut(keyword);
-            });
-        }
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Delete button clicked for:', keyword);
+            deleteShortcut(keyword);
+        });
     }
 
     return div;
