@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     await checkFirstTime();
     await initializeSmartDetection();
+    await checkPendingElementSelection();
 });
 
 // Load shortcuts from background script
@@ -870,6 +871,16 @@ async function selectElement(elementType) {
             return;
         }
 
+        // Store the element selection state for when popup reopens
+        await chrome.storage.local.set({
+            pendingElementSelection: {
+                type: elementType,
+                tabId: tab.id,
+                timestamp: Date.now(),
+                formData: getCurrentFormData() // Save current form state
+            }
+        });
+
         // Disable the button to prevent multiple clicks
         const button = elementType === 'input' ? 
             document.getElementById('select-input-btn') : 
@@ -881,39 +892,34 @@ async function selectElement(elementType) {
 
         try {
             // Send message to content script to start element selection
-            const result = await chrome.tabs.sendMessage(tab.id, {
+            // Note: We don't wait for response here because popup will close
+            chrome.tabs.sendMessage(tab.id, {
                 action: 'startElementSelection',
                 type: elementType
             });
 
-            if (result && result.selector) {
-                // Fill in the selector field
-                const selectorField = elementType === 'input' ? 
-                    document.getElementById('input-selector') : 
-                    document.getElementById('button-selector');
-                
-                selectorField.value = result.selector;
-                
-                // Show success feedback
-                showSuccessFeedback(`Selected ${elementType} element: ${result.description}`);
-            } else if (result === null) {
-                // User cancelled
-                console.log('Element selection cancelled');
-            } else {
-                alert('Failed to select element. Please try again.');
-            }
+            // Inform user what to do
+            showSuccessFeedback(`Click on a ${elementType} element on the webpage, then reopen this popup to continue.`);
+            
+            // Don't auto-close popup, let user close it manually
+            // They need to understand they must reopen it after element selection
+
         } catch (error) {
             console.error('Error selecting element:', error);
+            
+            // Clear pending selection on error
+            await chrome.storage.local.remove('pendingElementSelection');
+            
             if (error.message.includes('Could not establish connection')) {
                 alert('Please switch to the target website tab and try again.');
             } else {
                 alert('Failed to select element. Please ensure the page is fully loaded and try again.');
             }
+            
+            // Re-enable the button
+            button.disabled = false;
+            button.textContent = originalText;
         }
-
-        // Re-enable the button
-        button.disabled = false;
-        button.textContent = originalText;
 
     } catch (error) {
         console.error('Error in selectElement:', error);
@@ -932,5 +938,103 @@ async function validateSelector(selector, elementType) {
     } catch (error) {
         console.warn(`Invalid ${elementType} selector:`, selector, error);
         return false;
+    }
+}
+
+// Get current form data for element selection persistence
+function getCurrentFormData() {
+    return {
+        keyword: document.getElementById('shortcut-keyword').value,
+        name: document.getElementById('shortcut-name').value,
+        shortcutType: document.querySelector('input[name="shortcut-type"]:checked')?.value,
+        simpleUrl: document.getElementById('shortcut-url').value,
+        advancedUrl: document.getElementById('advanced-url').value,
+        inputSelector: document.getElementById('input-selector').value,
+        buttonSelector: document.getElementById('button-selector').value,
+        isEditing: editingShortcut
+    };
+}
+
+// Restore form data for element selection persistence
+function restoreFormData(formData) {
+    if (!formData) return;
+    
+    // Restore basic fields
+    document.getElementById('shortcut-keyword').value = formData.keyword || '';
+    document.getElementById('shortcut-name').value = formData.name || '';
+    document.getElementById('shortcut-url').value = formData.simpleUrl || '';
+    document.getElementById('advanced-url').value = formData.advancedUrl || '';
+    document.getElementById('input-selector').value = formData.inputSelector || '';
+    document.getElementById('button-selector').value = formData.buttonSelector || '';
+    
+    // Restore editing state
+    editingShortcut = formData.isEditing;
+    
+    // Restore shortcut type
+    if (formData.shortcutType) {
+        const radio = document.querySelector(`input[name="shortcut-type"][value="${formData.shortcutType}"]`);
+        if (radio) {
+            radio.checked = true;
+            handleShortcutTypeChange();
+        }
+    }
+    
+    // Open modal if form had data
+    if (formData.keyword || formData.name) {
+        openModal();
+        
+        // Update modal title if editing
+        if (formData.isEditing) {
+            document.getElementById('modal-title').textContent = 'Edit Shortcut';
+            document.getElementById('save-btn').textContent = 'Update';
+        }
+    }
+}
+
+// Check for pending element selection when popup opens
+async function checkPendingElementSelection() {
+    try {
+        const result = await chrome.storage.local.get('pendingElementSelection');
+        const pending = result.pendingElementSelection;
+        
+        if (!pending) return;
+        
+        // Check if selection is recent (within 30 seconds)
+        const timeDiff = Date.now() - pending.timestamp;
+        if (timeDiff > 30000) {
+            // Clean up old pending selection
+            await chrome.storage.local.remove('pendingElementSelection');
+            return;
+        }
+        
+        console.log('Found pending element selection:', pending);
+        
+        // Restore form state
+        if (pending.formData) {
+            restoreFormData(pending.formData);
+        }
+        
+        // Check for completed selection result
+        const selectionResult = await chrome.storage.local.get('elementSelectionResult');
+        if (selectionResult.elementSelectionResult) {
+            const result = selectionResult.elementSelectionResult;
+            console.log('Found completed element selection result:', result);
+            
+            // Fill in the selector field
+            const selectorField = pending.type === 'input' ? 
+                document.getElementById('input-selector') : 
+                document.getElementById('button-selector');
+            
+            selectorField.value = result.selector;
+            
+            // Show success feedback
+            showSuccessFeedback(`Selected ${pending.type} element: ${result.description}`);
+            
+            // Clean up both pending selection and result
+            await chrome.storage.local.remove(['pendingElementSelection', 'elementSelectionResult']);
+        }
+        
+    } catch (error) {
+        console.error('Error checking pending element selection:', error);
     }
 }

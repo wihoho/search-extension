@@ -243,14 +243,40 @@ function handleClick(event) {
   
   console.log('Element selected:', { element, selector, description });
   
-  if (selectionCallback) {
-    selectionCallback({
-      selector: selector,
-      description: description,
-      tagName: element.tagName.toLowerCase(),
-      element: element
+  const result = {
+    selector: selector,
+    description: description,
+    tagName: element.tagName.toLowerCase(),
+    timestamp: Date.now()
+  };
+  
+  // Store result in chrome.storage.local for popup to retrieve
+  chrome.storage.local.set({
+    elementSelectionResult: result
+  }).then(() => {
+    console.log('Element selection result stored:', result);
+    
+    // Also call the callback if it exists (for backward compatibility)
+    if (selectionCallback) {
+      selectionCallback(result);
+    }
+    
+    // Trigger popup to open by sending message to background script
+    chrome.runtime.sendMessage({
+      action: 'elementSelected',
+      result: result
+    }).catch(error => {
+      console.log('Background script message failed (expected during development):', error);
     });
-  }
+    
+  }).catch(error => {
+    console.error('Failed to store element selection result:', error);
+    
+    // Fallback to callback
+    if (selectionCallback) {
+      selectionCallback(result);
+    }
+  });
   
   stopElementSelection();
 }
@@ -262,6 +288,12 @@ function handleKeyDown(event) {
   if (event.key === 'Escape') {
     event.preventDefault();
     stopElementSelection();
+    
+    // Clear pending selection when cancelled
+    chrome.storage.local.remove(['pendingElementSelection', 'elementSelectionResult']).catch(error => {
+      console.log('Failed to clear pending selection (not critical):', error);
+    });
+    
     if (selectionCallback) {
       selectionCallback(null); // Cancelled
     }

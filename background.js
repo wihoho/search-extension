@@ -298,6 +298,21 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         sendResponse({ success: false, error: error.message });
       });
       return true; // Will respond asynchronously
+    } else if (request.action === 'elementSelected') {
+      // Handle element selection completion - reopen popup
+      debugLog('Element selected, attempting to reopen popup');
+      try {
+        // Open the extension popup programmatically
+        chrome.action.openPopup().catch(error => {
+          debugLog('Could not auto-open popup (user must click extension icon):', error);
+          // Note: chrome.action.openPopup() requires user gesture in newer Chrome versions
+          // The user will need to click the extension icon manually
+        });
+        sendResponse({ success: true });
+      } catch (error) {
+        debugLog('Error handling element selection:', error);
+        sendResponse({ success: false, error: error.message });
+      }
     }
   } catch (error) {
     console.error('OmniSearch: Error handling message:', error);
