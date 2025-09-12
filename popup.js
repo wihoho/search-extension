@@ -116,10 +116,20 @@ async function loadShortcuts() {
         chrome.runtime.sendMessage({ action: 'getShortcuts' }, (response) => {
             if (chrome.runtime.lastError) {
                 console.error('Popup: Error communicating with background script:', chrome.runtime.lastError);
-                shortcuts = {};
-            } else {
+                // Don't reset to empty - keep existing shortcuts if any
+                if (Object.keys(shortcuts).length === 0) {
+                    shortcuts = {};
+                }
+                console.warn('Popup: Using fallback shortcuts due to communication error');
+            } else if (response && response.shortcuts) {
                 console.log('Popup: Received shortcuts:', response);
-                shortcuts = response.shortcuts || {};
+                shortcuts = response.shortcuts;
+            } else {
+                console.warn('Popup: Invalid response from background script:', response);
+                // Don't overwrite existing shortcuts with empty object
+                if (Object.keys(shortcuts).length === 0) {
+                    shortcuts = {};
+                }
             }
             resolve();
         });
@@ -129,7 +139,37 @@ async function loadShortcuts() {
 // Save shortcuts to storage
 async function saveShortcuts() {
     return new Promise((resolve) => {
+        // Validate that we have shortcuts to save
+        if (!shortcuts || Object.keys(shortcuts).length === 0) {
+            console.warn('Popup: Attempting to save empty shortcuts - this may be a bug');
+            // Try to reload shortcuts first
+            loadShortcuts().then(() => {
+                if (Object.keys(shortcuts).length === 0) {
+                    console.error('Popup: No shortcuts to save after reload');
+                    resolve(false);
+                    return;
+                }
+                // Retry save after reload
+                chrome.runtime.sendMessage({
+                    action: 'updateShortcuts',
+                    shortcuts: shortcuts
+                }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.error('Popup: Error saving shortcuts after reload:', chrome.runtime.lastError);
+                        resolve(false);
+                    } else {
+                        console.log('Popup: Shortcuts saved successfully after reload:', response);
+                        resolve(response.success);
+                    }
+                });
+            });
+            return;
+        }
+
         console.log('Popup: Saving shortcuts to background script');
+        console.log('Popup: Shortcut count:', Object.keys(shortcuts).length);
+        console.log('Popup: Shortcuts being saved:', Object.keys(shortcuts).join(', '));
+        
         chrome.runtime.sendMessage({
             action: 'updateShortcuts',
             shortcuts: shortcuts
@@ -405,8 +445,25 @@ async function handleFormSubmit(e) {
         const isEditing = editingShortcut !== null;
         const actionText = isEditing ? 'updated' : 'added';
 
+        // Safety check: ensure we have shortcuts loaded before saving
+        if (!shortcuts || Object.keys(shortcuts).length === 0) {
+            console.warn('Popup: No shortcuts loaded, reloading before save...');
+            await loadShortcuts();
+            
+            // If still no shortcuts, this might be a first-time user
+            if (!shortcuts || Object.keys(shortcuts).length === 0) {
+                console.log('Popup: No existing shortcuts found, this appears to be first custom shortcut');
+                shortcuts = {};
+            }
+        }
+
+        console.log(`Popup: Adding ${actionText} shortcut "${keyword}" to ${Object.keys(shortcuts).length} existing shortcuts`);
+        console.log('Popup: Existing shortcuts before save:', Object.keys(shortcuts).join(', '));
+
         // Save shortcut
         shortcuts[keyword] = shortcutData;
+
+        console.log('Popup: Shortcuts after adding new one:', Object.keys(shortcuts).join(', '));
 
         await saveShortcuts();
         renderShortcuts();
