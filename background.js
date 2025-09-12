@@ -1,8 +1,8 @@
 // OmniSearch Background Script
 // Handles omnibox functionality and search redirections
 
-// Debug mode - set to false for production
-const DEBUG = false;
+// Debug mode - set to true for production
+const DEBUG = true;
 
 function debugLog(...args) {
   if (DEBUG) {
@@ -14,6 +14,16 @@ debugLog('Background script starting...');
 
 // Default search shortcuts configuration
 const DEFAULT_SHORTCUTS = {
+  'ai': {
+    name: 'AI Studio',
+    keyword: 'ai',
+    type: 'advanced',
+    url: 'https://aistudio.google.com/prompts/new_chat',
+    inputSelector: 'textarea',
+    buttonSelector: 'button[aria-label*="Run"]:not([disabled])',
+    enabled: true,
+    icon: 'https://www.gstatic.com/a/images/brand/project-wordmark/bard-64.png'
+  },
   'drive': {
     name: 'Google Drive',
     url: 'https://drive.google.com/drive/search?q=%s',
@@ -171,44 +181,62 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
 });
 
 // Omnibox input entered - perform search
-chrome.omnibox.onInputEntered.addListener((text, disposition) => {
-  debugLog('Input entered:', text, 'disposition:', disposition);
+chrome.omnibox.onInputEntered.addListener(async (text) => {
+  debugLog('Input entered:', text);
 
   try {
-    const parts = text.split(' ');
-    const keyword = parts[0].toLowerCase();
-    const query = parts.slice(1).join(' ').trim();
+    const [keyword, ...queryParts] = text.split(' ');
+    const query = queryParts.join(' ');
+    const shortcut = currentShortcuts[keyword.toLowerCase()];
 
     debugLog('Parsed - keyword:', keyword, 'query:', query);
-    debugLog('Available shortcuts:', Object.keys(currentShortcuts));
-    debugLog('Keyword exists:', !!currentShortcuts[keyword]);
-    debugLog('Keyword enabled:', currentShortcuts[keyword]?.enabled);
 
-    if (currentShortcuts[keyword] && currentShortcuts[keyword].enabled && query) {
-      const searchUrl = currentShortcuts[keyword].url.replace('%s', encodeURIComponent(query));
-      debugLog('Generated search URL:', searchUrl);
-
-      // Open in current tab, new tab, or new window based on disposition
-      if (disposition === 'currentTab') {
-        debugLog('Opening in current tab');
-        chrome.tabs.update({ url: searchUrl });
-      } else if (disposition === 'newForegroundTab') {
-        debugLog('Opening in new foreground tab');
-        chrome.tabs.create({ url: searchUrl });
-      } else if (disposition === 'newBackgroundTab') {
-        debugLog('Opening in new background tab');
-        chrome.tabs.create({ url: searchUrl, active: false });
-      }
-    } else {
-      debugLog('Search not executed - invalid keyword or empty query');
-      if (!currentShortcuts[keyword]) {
-        debugLog('Keyword not found in shortcuts');
-      } else if (!currentShortcuts[keyword].enabled) {
-        debugLog('Keyword is disabled');
-      } else if (!query) {
-        debugLog('Query is empty');
-      }
+    if (!shortcut || !shortcut.enabled || !query) {
+      debugLog('Search not executed - invalid keyword, disabled, or empty query');
+      return;
     }
+
+    if (shortcut.type === 'advanced') {
+      // --- THIS IS THE NEW ADVANCED WORKFLOW ---
+      debugLog(`Executing advanced shortcut: '${keyword}'`);
+      
+      const tab = await chrome.tabs.create({ url: shortcut.url, active: true });
+      debugLog(`Created tab ${tab.id} with URL: ${shortcut.url}`);
+
+      // The content script is now injected via manifest.json, so we just need to
+      // wait for the tab to be ready and send the message.
+      const listener = (tabId, changeInfo) => {
+        debugLog(`Tab update detected: tabId=${tabId}, status=${changeInfo.status}`);
+        if (tabId === tab.id && changeInfo.status === 'complete') {
+          debugLog(`Tab ${tabId} is complete. Sending message...`);
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'OMNISEARCH_AUTOMATE',
+            query: query,
+            inputSelector: shortcut.inputSelector,
+            buttonSelector: shortcut.buttonSelector
+          }, (response) => {
+            if (chrome.runtime.lastError) {
+              console.error('OmniSearch: Error sending message:', chrome.runtime.lastError.message);
+            } else {
+              debugLog('Automation script responded:', response);
+            }
+          });
+          
+          // Clean up the listener
+          debugLog(`Removing listener for tab ${tabId}`);
+          chrome.tabs.onUpdated.removeListener(listener);
+        }
+      };
+      chrome.tabs.onUpdated.addListener(listener);
+
+    } else {
+      // --- THIS IS THE EXISTING SIMPLE WORKFLOW ---
+      debugLog('Executing simple shortcut:', keyword);
+      const searchUrl = shortcut.url.replace('%s', encodeURIComponent(query));
+      debugLog('Generated search URL:', searchUrl);
+      chrome.tabs.create({ url: searchUrl });
+    }
+
   } catch (error) {
     console.error('OmniSearch: Error in onInputEntered:', error);
   }

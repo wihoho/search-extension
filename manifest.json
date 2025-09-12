@@ -1,19 +1,22 @@
 {
   "manifest_version": 3,
   "name": "OmniSearch",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Quick search shortcuts for popular websites directly from Chrome's address bar",
   "permissions": [
     "storage",
-    "tabs"
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://aistudio.google.com/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content-script.js"],
+      "matches": ["https://aistudio.google.com/*"],
+      "js": ["automation-script.js"],
       "run_at": "document_idle"
     }
   ],
@@ -39,7 +42,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["welcome.html", "debug.html"],
+      "resources": ["welcome.html", "debug.html", "automation-script.js"],
       "matches": ["<all_urls>"]
     }
   ]
