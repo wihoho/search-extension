@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Storage Bug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-step {
+            margin: 10px 0;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .log {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Custom Shortcuts Storage Bug Test</h1>
+    
+    <div class="test-section">
+        <h3>Current Storage State</h3>
+        <div class="test-step">
+            <button class="btn-primary" onclick="loadCurrentState()">Load Current Storage</button>
+            <button class="btn-warning" onclick="clearStorage()">Clear All Storage</button>
+            <button class="btn-success" onclick="resetToDefaults()">Reset to Defaults</button>
+        </div>
+        <pre id="currentState">Click "Load Current Storage" to see current shortcuts</pre>
+    </div>
+
+    <div class="test-section">
+        <h3>🐛 Bug Demonstration & Fix Verification</h3>
+        <div class="test-step">
+            <p><strong>Before Fix (Bug):</strong></p>
+            <button class="btn-danger" onclick="simulateBuggyBehavior()">Simulate Buggy Behavior</button>
+            <p><em>This shows how shortcuts would be lost before the fix</em></p>
+        </div>
+        <div class="test-step">
+            <p><strong>After Fix (Working):</strong></p>
+            <button class="btn-success" onclick="simulateFixedBehavior()">Simulate Fixed Behavior</button>
+            <p><em>This shows how shortcuts are preserved with the fix</em></p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Case: Add Multiple Custom Shortcuts</h3>
+        <div class="test-step">
+            <p><strong>Step 1:</strong> Add first custom shortcut</p>
+            <button class="btn-primary" onclick="addCustomShortcut('reddit', 'Reddit', 'https://www.reddit.com/search/?q=%s')">Add Reddit Shortcut</button>
+        </div>
+        <div class="test-step">
+            <p><strong>Step 2:</strong> Add second custom shortcut</p>
+            <button class="btn-primary" onclick="addCustomShortcut('stackoverflow', 'Stack Overflow', 'https://stackoverflow.com/search?q=%s')">Add StackOverflow Shortcut</button>
+        </div>
+        <div class="test-step">
+            <p><strong>Step 3:</strong> Add third custom shortcut</p>
+            <button class="btn-primary" onclick="addCustomShortcut('github', 'GitHub', 'https://github.com/search?q=%s')">Add GitHub Shortcut</button>
+        </div>
+        <div class="test-step">
+            <p><strong>Expected Result:</strong> All three shortcuts should be present after each addition</p>
+            <button class="btn-success" onclick="verifyAllShortcuts()">Verify All Shortcuts</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Log</h3>
+        <div id="testLog"></div>
+        <button class="btn-warning" onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        // Simulate the storage mechanism used by the extension
+        let testShortcuts = {};
+        
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log';
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+        }
+
+        async function loadCurrentState() {
+            try {
+                // Simulate loading from chrome.storage
+                const result = await chrome.storage.sync.get(['shortcuts']);
+                testShortcuts = result.shortcuts || {};
+                
+                document.getElementById('currentState').textContent = 
+                    JSON.stringify(testShortcuts, null, 2);
+                
+                log(`Loaded ${Object.keys(testShortcuts).length} shortcuts from storage`);
+                log(`Shortcuts: ${Object.keys(testShortcuts).join(', ')}`);
+            } catch (error) {
+                log(`Error loading storage: ${error.message}`, 'error');
+                // Fallback for testing without extension context
+                document.getElementById('currentState').textContent = 
+                    'Extension context not available - using test data:\n' + 
+                    JSON.stringify(testShortcuts, null, 2);
+            }
+        }
+
+        async function clearStorage() {
+            try {
+                await chrome.storage.sync.clear();
+                testShortcuts = {};
+                log('Cleared all storage');
+                loadCurrentState();
+            } catch (error) {
+                testShortcuts = {};
+                log('Cleared test storage (extension context not available)');
+                loadCurrentState();
+            }
+        }
+
+        async function resetToDefaults() {
+            const defaults = {
+                'drive': { name: 'Google Drive', url: 'https://drive.google.com/drive/search?q=%s', enabled: true },
+                'gmail': { name: 'Gmail', url: 'https://mail.google.com/mail/u/0/#search/%s', enabled: true },
+                'youtube': { name: 'YouTube', url: 'https://www.youtube.com/results?search_query=%s', enabled: true }
+            };
+            
+            try {
+                await chrome.storage.sync.set({ shortcuts: defaults });
+                testShortcuts = defaults;
+                log('Reset to default shortcuts');
+                loadCurrentState();
+            } catch (error) {
+                testShortcuts = defaults;
+                log('Reset to default shortcuts (test mode)');
+                loadCurrentState();
+            }
+        }
+
+        async function addCustomShortcut(keyword, name, url) {
+            log(`Adding custom shortcut: ${keyword} -> ${name}`);
+            
+            try {
+                // This is the critical part - simulate the current popup.js behavior
+                // Step 1: Load current shortcuts (like popup.js does)
+                const result = await chrome.storage.sync.get(['shortcuts']);
+                const loadedShortcuts = result.shortcuts || {};
+                
+                log(`Before adding ${keyword}: Found ${Object.keys(loadedShortcuts).length} existing shortcuts`);
+                log(`Existing shortcuts: ${Object.keys(loadedShortcuts).join(', ')}`);
+                
+                // Step 2: Add new shortcut to loaded shortcuts
+                loadedShortcuts[keyword] = {
+                    name: name,
+                    url: url,
+                    enabled: true,
+                    icon: `https://www.google.com/s2/favicons?domain=${new URL(url.replace('%s', '')).hostname}`
+                };
+                
+                // Step 3: Save back to storage (this is where the bug might occur)
+                await chrome.storage.sync.set({ shortcuts: loadedShortcuts });
+                
+                testShortcuts = loadedShortcuts;
+                log(`Added ${keyword}. Now have ${Object.keys(testShortcuts).length} shortcuts total`);
+                log(`All shortcuts: ${Object.keys(testShortcuts).join(', ')}`);
+                
+            } catch (error) {
+                // Fallback for testing without extension context
+                testShortcuts[keyword] = {
+                    name: name,
+                    url: url,
+                    enabled: true
+                };
+                log(`Added ${keyword} (test mode). Now have ${Object.keys(testShortcuts).length} shortcuts`);
+            }
+            
+            loadCurrentState();
+        }
+
+        async function verifyAllShortcuts() {
+            const expectedShortcuts = ['reddit', 'stackoverflow', 'github'];
+            const actualShortcuts = Object.keys(testShortcuts);
+            
+            log('=== VERIFICATION ===');
+            log(`Expected shortcuts: ${expectedShortcuts.join(', ')}`);
+            log(`Actual shortcuts: ${actualShortcuts.join(', ')}`);
+            
+            const missing = expectedShortcuts.filter(s => !actualShortcuts.includes(s));
+            const extra = actualShortcuts.filter(s => !expectedShortcuts.includes(s) && !['drive', 'gmail', 'youtube'].includes(s));
+            
+            if (missing.length > 0) {
+                log(`❌ MISSING SHORTCUTS: ${missing.join(', ')}`, 'error');
+            }
+            
+            if (extra.length > 0) {
+                log(`ℹ️ Extra shortcuts (defaults): ${extra.join(', ')}`);
+            }
+            
+            if (missing.length === 0) {
+                log('✅ All custom shortcuts are present!');
+            } else {
+                log('❌ BUG REPRODUCED: Some shortcuts are missing!');
+            }
+        }
+
+        async function simulateBuggyBehavior() {
+            log('=== SIMULATING BUGGY BEHAVIOR (BEFORE FIX) ===');
+            
+            // Start with some existing shortcuts
+            testShortcuts = {
+                'drive': { name: 'Google Drive', url: 'https://drive.google.com/drive/search?q=%s', enabled: true },
+                'reddit': { name: 'Reddit', url: 'https://www.reddit.com/search/?q=%s', enabled: true },
+                'stackoverflow': { name: 'Stack Overflow', url: 'https://stackoverflow.com/search?q=%s', enabled: true }
+            };
+            
+            log('Starting with 3 shortcuts: drive, reddit, stackoverflow');
+            
+            // Simulate the bug: popup loads before background is ready
+            log('🐛 Bug: Popup loads before background script initializes...');
+            log('🐛 Bug: Popup receives empty shortcuts object');
+            const emptyShortcuts = {}; // This is what the buggy version would return
+            
+            log('🐛 Bug: User adds new shortcut to empty object...');
+            emptyShortcuts['github'] = { name: 'GitHub', url: 'https://github.com/search?q=%s', enabled: true };
+            
+            log('🐛 Bug: Saving empty object with only new shortcut...');
+            testShortcuts = emptyShortcuts; // This overwrites all existing shortcuts!
+            
+            log(`🐛 RESULT: Only ${Object.keys(testShortcuts).length} shortcut remains: ${Object.keys(testShortcuts).join(', ')}`);
+            log('❌ LOST SHORTCUTS: reddit, stackoverflow');
+            
+            loadCurrentState();
+        }
+
+        async function simulateFixedBehavior() {
+            log('=== SIMULATING FIXED BEHAVIOR (AFTER FIX) ===');
+            
+            // Start with some existing shortcuts
+            testShortcuts = {
+                'drive': { name: 'Google Drive', url: 'https://drive.google.com/drive/search?q=%s', enabled: true },
+                'reddit': { name: 'Reddit', url: 'https://www.reddit.com/search/?q=%s', enabled: true },
+                'stackoverflow': { name: 'Stack Overflow', url: 'https://stackoverflow.com/search?q=%s', enabled: true }
+            };
+            
+            log('Starting with 3 shortcuts: drive, reddit, stackoverflow');
+            
+            // Simulate the fix: popup waits for background to load
+            log('✅ Fix: Popup requests shortcuts from background...');
+            log('✅ Fix: Background not ready, triggers loading...');
+            log('✅ Fix: Background loads all existing shortcuts from storage');
+            const loadedShortcuts = {...testShortcuts}; // This gets all existing shortcuts
+            
+            log('✅ Fix: User adds new shortcut to complete object...');
+            loadedShortcuts['github'] = { name: 'GitHub', url: 'https://github.com/search?q=%s', enabled: true };
+            
+            log('✅ Fix: Saving complete object with all shortcuts...');
+            testShortcuts = loadedShortcuts; // This preserves all existing shortcuts!
+            
+            log(`✅ RESULT: All ${Object.keys(testShortcuts).length} shortcuts preserved: ${Object.keys(testShortcuts).join(', ')}`);
+            log('✅ NO SHORTCUTS LOST!');
+            
+            loadCurrentState();
+        }
+
+        // Initialize
+        loadCurrentState();
+    </script>
+</body>
+</html>

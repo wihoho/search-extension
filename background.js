@@ -82,6 +82,7 @@ const DEFAULT_SHORTCUTS = {
 
 let currentShortcuts = {};
 let currentKeyword = '';
+let shortcutsLoaded = false;
 
 // Initialize extension
 chrome.runtime.onInstalled.addListener(async (details) => {
@@ -123,10 +124,12 @@ async function loadShortcuts() {
     debugLog('Loading shortcuts from storage...');
     const result = await chrome.storage.sync.get(['shortcuts']);
     currentShortcuts = result.shortcuts || DEFAULT_SHORTCUTS;
+    shortcutsLoaded = true;
     debugLog('Loaded shortcuts:', Object.keys(currentShortcuts));
   } catch (error) {
     console.error('OmniSearch: Error loading shortcuts:', error);
     currentShortcuts = DEFAULT_SHORTCUTS;
+    shortcutsLoaded = true;
   }
 }
 
@@ -257,18 +260,44 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
   try {
     if (request.action === 'getShortcuts') {
-      debugLog('Sending shortcuts to popup:', Object.keys(currentShortcuts));
-      sendResponse({ shortcuts: currentShortcuts });
+      // Ensure shortcuts are loaded before responding
+      if (!shortcutsLoaded) {
+        debugLog('Shortcuts not loaded yet, loading now...');
+        loadShortcuts().then(() => {
+          debugLog('Sending shortcuts to popup:', Object.keys(currentShortcuts));
+          sendResponse({ shortcuts: currentShortcuts });
+        }).catch(error => {
+          console.error('OmniSearch: Error loading shortcuts for popup:', error);
+          sendResponse({ shortcuts: DEFAULT_SHORTCUTS });
+        });
+        return true; // Will respond asynchronously
+      } else {
+        debugLog('Sending shortcuts to popup:', Object.keys(currentShortcuts));
+        sendResponse({ shortcuts: currentShortcuts });
+      }
     } else if (request.action === 'updateShortcuts') {
       debugLog('Updating shortcuts from popup');
-      chrome.storage.sync.set({ shortcuts: request.shortcuts });
-      currentShortcuts = request.shortcuts;
-      sendResponse({ success: true });
+      // Ensure we save to storage first, then update current shortcuts
+      chrome.storage.sync.set({ shortcuts: request.shortcuts }).then(() => {
+        currentShortcuts = request.shortcuts;
+        debugLog('Shortcuts saved and updated:', Object.keys(currentShortcuts));
+        sendResponse({ success: true });
+      }).catch(error => {
+        console.error('OmniSearch: Error saving shortcuts:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+      return true; // Will respond asynchronously
     } else if (request.action === 'resetToDefaults') {
       debugLog('Resetting to default shortcuts');
-      chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS });
-      currentShortcuts = DEFAULT_SHORTCUTS;
-      sendResponse({ success: true });
+      chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS }).then(() => {
+        currentShortcuts = DEFAULT_SHORTCUTS;
+        shortcutsLoaded = true;
+        sendResponse({ success: true });
+      }).catch(error => {
+        console.error('OmniSearch: Error resetting shortcuts:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+      return true; // Will respond asynchronously
     }
   } catch (error) {
     console.error('OmniSearch: Error handling message:', error);
