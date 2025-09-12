@@ -331,15 +331,49 @@ chrome.commands.onCommand.addListener(async (command) => {
   }
 });
 
+// Helper function to check if URL is restricted
+function isRestrictedUrl(url) {
+  if (!url || typeof url !== 'string') return true;
+  
+  const restrictedPrefixes = [
+    'chrome://',
+    'chrome-extension://',
+    'moz-extension://',
+    'safari-extension://',
+    'edge-extension://',
+    'chrome-devtools://',
+    'devtools://',
+    'about:'
+  ];
+  
+  return restrictedPrefixes.some(prefix => url.startsWith(prefix));
+}
+
 // Helper function to toggle sidebar
 async function toggleSidebar(tabId) {
   try {
+    // Get tab information to check URL
+    const tab = await chrome.tabs.get(tabId);
+    
+    // Check if the URL is restricted
+    if (isRestrictedUrl(tab.url)) {
+      debugLog(`Cannot toggle sidebar on restricted URL: ${tab.url}`);
+      return;
+    }
+    
     // Send message to content script to toggle sidebar
     await chrome.tabs.sendMessage(tabId, { action: 'toggleSidebar' });
   } catch (error) {
     debugLog('Error toggling sidebar:', error);
     // If content script isn't ready, inject it first
     try {
+      // Double-check URL before injection attempt
+      const tab = await chrome.tabs.get(tabId);
+      if (isRestrictedUrl(tab.url)) {
+        debugLog(`Cannot inject script on restricted URL: ${tab.url}`);
+        return;
+      }
+      
       await chrome.scripting.executeScript({
         target: { tabId: tabId },
         files: ['sidebar.js']
