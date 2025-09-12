@@ -210,36 +210,67 @@
                     <small>The page where the search will be performed</small>
                     
                     <div class="element-selector-section">
+                        <div class="selector-preference">
+                            <label>Selector Type Preference:</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="selector-type" value="xpath" checked>
+                                    <span>XPath (Recommended)</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="selector-type" value="css">
+                                    <span>CSS Selector</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="element-selector-row">
                             <div class="element-field">
                                 <label for="input-selector">Input Element Selector</label>
-                                <input type="text" id="input-selector" placeholder="textarea, //input[@type='text'], etc.">
-                                <small>CSS selector or XPath for the search input field</small>
+                                <input type="text" id="input-selector" placeholder="//textarea | //input[@type='text'] | input[type='text']">
+                                <small>XPath or CSS selector for the search input field</small>
                             </div>
-                            <button type="button" class="btn btn-select" id="select-input-btn">
-                                🎯 Select on Page
+                            <button type="button" class="btn btn-select" id="select-input-btn" title="Click to visually select an input element on the webpage">
+                                🎯 Select Input Element
                             </button>
                         </div>
                         
                         <div class="element-selector-row">
                             <div class="element-field">
                                 <label for="button-selector">Submit Button Selector</label>
-                                <input type="text" id="button-selector" placeholder="button[type='submit'], //button[text()='Search'], etc.">
-                                <small>CSS selector or XPath for the submit button</small>
+                                <input type="text" id="button-selector" placeholder="//button[text()='Search'] | //button[@type='submit'] | button[type='submit']">
+                                <small>XPath or CSS selector for the submit button</small>
                             </div>
-                            <button type="button" class="btn btn-select" id="select-button-btn">
-                                🎯 Select on Page
+                            <button type="button" class="btn btn-select" id="select-button-btn" title="Click to visually select a button element on the webpage">
+                                🎯 Select Button Element
                             </button>
                         </div>
                         
                         <div class="selector-help">
-                            <p><strong>How to use element selection:</strong></p>
-                            <ol>
-                                <li>Navigate to the target website in another tab</li>
-                                <li>Come back to this popup and click "Select on Page"</li>
-                                <li>Switch to the website tab and click on the desired element</li>
-                                <li>The selector will be automatically filled in</li>
-                            </ol>
+                            <div class="help-header">
+                                <strong>💡 Easy Element Selection</strong>
+                            </div>
+                            <div class="help-steps">
+                                <div class="step">
+                                    <span class="step-number">1</span>
+                                    <span>Open the target website in a new tab</span>
+                                </div>
+                                <div class="step">
+                                    <span class="step-number">2</span>
+                                    <span>Click "🎯 Select Input Element" or "🎯 Select Button Element"</span>
+                                </div>
+                                <div class="step">
+                                    <span class="step-number">3</span>
+                                    <span>Switch to the website tab and click on the element you want</span>
+                                </div>
+                                <div class="step">
+                                    <span class="step-number">4</span>
+                                    <span>The selector will be automatically filled in for you!</span>
+                                </div>
+                            </div>
+                            <div class="help-tip">
+                                <strong>💭 Tip:</strong> XPath selectors are more reliable for automation across different websites.
+                            </div>
                         </div>
                     </div>
                 </div>

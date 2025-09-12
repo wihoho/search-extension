@@ -215,7 +215,11 @@ function startElementSelection(type, callback) {
   // Create instructions
   const instructions = document.createElement('div');
   instructions.className = 'omnisearch-instructions';
-  instructions.textContent = `Click on a ${type} element to select it. Press ESC to cancel.`;
+  instructions.innerHTML = `
+    <div style="font-weight: 600; margin-bottom: 8px;">🎯 Element Selection Mode</div>
+    <div>Click on the ${type} element you want to select</div>
+    <div style="font-size: 12px; margin-top: 6px; opacity: 0.9;">Press ESC to cancel</div>
+  `;
   document.body.appendChild(instructions);
   console.log('Created instructions element');
   
@@ -311,7 +315,7 @@ function handleClick(event) {
     selectionCallback({
       cssSelector: cssSelector,
       xpathSelector: xpathSelector,
-      selector: cssSelector, // Default to CSS for backward compatibility
+      selector: xpathSelector, // Default to XPath as requested in issue #5
       description: description,
       tagName: element.tagName.toLowerCase(),
       element: element
