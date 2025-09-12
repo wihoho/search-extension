@@ -295,6 +295,257 @@ body.omnisearch-sidebar-open {
     align-items: center !important;
 }
 
+/* Shortcut Type Label */
+.omnisearch-shortcut-type {
+    font-size: 10px !important;
+    color: #6c757d !important;
+    background: #f8f9fa !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+    margin-top: 2px !important;
+}
+
+.omnisearch-advanced-shortcut .omnisearch-shortcut-type {
+    background: #e3f2fd !important;
+    color: #1976d2 !important;
+}
+
+/* Toggle Switch */
+.omnisearch-toggle-switch {
+    position: relative !important;
+    display: inline-block !important;
+    width: 40px !important;
+    height: 20px !important;
+}
+
+.omnisearch-toggle-switch input {
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.omnisearch-toggle-slider {
+    position: absolute !important;
+    cursor: pointer !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: #ccc !important;
+    transition: .4s !important;
+    border-radius: 20px !important;
+}
+
+.omnisearch-toggle-slider:before {
+    position: absolute !important;
+    content: "" !important;
+    height: 16px !important;
+    width: 16px !important;
+    left: 2px !important;
+    bottom: 2px !important;
+    background-color: white !important;
+    transition: .4s !important;
+    border-radius: 50% !important;
+}
+
+input:checked + .omnisearch-toggle-slider {
+    background-color: #667eea !important;
+}
+
+input:checked + .omnisearch-toggle-slider:before {
+    transform: translateX(20px) !important;
+}
+
+/* Edit/Delete Buttons */
+.omnisearch-btn-edit {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    border: 1px solid #dee2e6 !important;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+}
+
+.omnisearch-btn-edit:hover {
+    background: #e9ecef !important;
+    color: #495057 !important;
+}
+
+.omnisearch-btn-danger {
+    background: #dc3545 !important;
+    color: white !important;
+    border: 1px solid #dc3545 !important;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+}
+
+.omnisearch-btn-danger:hover {
+    background: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+/* Modal Styles */
+.omnisearch-modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 2147483647 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+    pointer-events: auto !important;
+}
+
+.omnisearch-modal-overlay.omnisearch-modal-show {
+    opacity: 1 !important;
+}
+
+.omnisearch-modal {
+    background: white !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+    width: 90% !important;
+    max-width: 400px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    transform: scale(0.8) !important;
+    transition: transform 0.3s ease !important;
+    color: #333 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.omnisearch-modal-show .omnisearch-modal {
+    transform: scale(1) !important;
+}
+
+.omnisearch-modal-wide {
+    max-width: 500px !important;
+}
+
+.omnisearch-modal-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid #e9ecef !important;
+}
+
+.omnisearch-modal-header h3 {
+    margin: 0 !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+}
+
+.omnisearch-modal-close {
+    background: none !important;
+    border: none !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    color: #6c757d !important;
+    padding: 0 !important;
+    width: 30px !important;
+    height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+}
+
+.omnisearch-modal-close:hover {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.omnisearch-modal-body {
+    padding: 20px !important;
+}
+
+.omnisearch-form-group {
+    margin-bottom: 16px !important;
+}
+
+.omnisearch-form-group:last-child {
+    margin-bottom: 0 !important;
+}
+
+.omnisearch-form-group label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+}
+
+.omnisearch-form-group input {
+    width: 100% !important;
+    padding: 8px 12px !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    font-size: 14px !important;
+    color: #495057 !important;
+    box-sizing: border-box !important;
+}
+
+.omnisearch-form-group input:focus {
+    outline: none !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+}
+
+.omnisearch-form-group small {
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 12px !important;
+    color: #6c757d !important;
+}
+
+.omnisearch-modal-footer {
+    display: flex !important;
+    gap: 8px !important;
+    justify-content: flex-end !important;
+    padding: 16px 20px !important;
+    border-top: 1px solid #e9ecef !important;
+    background: #f8f9fa !important;
+}
+
+/* Notification Styles */
+.omnisearch-notification {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    padding: 12px 16px !important;
+    border-radius: 6px !important;
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    z-index: 2147483648 !important;
+    transform: translateX(100%) !important;
+    transition: transform 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    max-width: 300px !important;
+}
+
+.omnisearch-notification-show {
+    transform: translateX(0) !important;
+}
+
+.omnisearch-notification-success {
+    background: #28a745 !important;
+}
+
+.omnisearch-notification-error {
+    background: #dc3545 !important;
+}
+
+.omnisearch-notification-info {
+    background: #17a2b8 !important;
+}
+
 /* Buttons */
 .omnisearch-btn {
     padding: 8px 16px !important;
@@ -308,6 +559,16 @@ body.omnisearch-sidebar-open {
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
+}
+
+.omnisearch-btn-small {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+}
+
+.omnisearch-add-button-group {
+    display: flex !important;
+    gap: 8px !important;
 }
 
 .omnisearch-btn-primary {
@@ -469,7 +730,10 @@ body.omnisearch-sidebar-open {
                         <div class="omnisearch-section">
                             <div class="omnisearch-section-header">
                                 <h2>Search Shortcuts</h2>
-                                <button class="omnisearch-btn omnisearch-btn-primary" id="omnisearch-add-shortcut-btn">+ Add Custom</button>
+                                <div class="omnisearch-add-button-group">
+                                    <button class="omnisearch-btn omnisearch-btn-primary omnisearch-btn-small" id="omnisearch-add-simple-btn">+ Simple</button>
+                                    <button class="omnisearch-btn omnisearch-btn-secondary omnisearch-btn-small" id="omnisearch-add-advanced-btn">+ Advanced</button>
+                                </div>
                             </div>
                             <div class="omnisearch-shortcuts-list" id="omnisearch-shortcuts-list">
                                 <!-- Shortcuts will be populated by JavaScript -->
@@ -571,6 +835,18 @@ body.omnisearch-sidebar-open {
                 closeSidebar();
             }
         });
+
+        // Add shortcut buttons
+        const addSimpleBtn = document.getElementById('omnisearch-add-simple-btn');
+        const addAdvancedBtn = document.getElementById('omnisearch-add-advanced-btn');
+
+        if (addSimpleBtn) {
+            addSimpleBtn.addEventListener('click', () => addNewShortcut('simple'));
+        }
+
+        if (addAdvancedBtn) {
+            addAdvancedBtn.addEventListener('click', () => addNewShortcut('advanced'));
+        }
     }
 
     // Open sidebar
@@ -661,13 +937,24 @@ body.omnisearch-sidebar-open {
     // Create shortcut element
     function createShortcutElement(keyword, shortcut) {
         const div = document.createElement('div');
-        div.className = 'omnisearch-shortcut-item';
+        div.className = `omnisearch-shortcut-item${shortcut.type === 'advanced' ? ' omnisearch-advanced-shortcut' : ''}`;
 
+        const typeLabel = shortcut.type === 'advanced' ? 'Advanced' : 'Simple';
+        
         div.innerHTML = `
             <img src="${shortcut.icon || chrome.runtime.getURL('icons/icon16.png')}" alt="${shortcut.name}" class="omnisearch-shortcut-icon" onerror="this.src='${chrome.runtime.getURL('icons/icon16.png')}'">
             <div class="omnisearch-shortcut-info">
                 <div class="omnisearch-shortcut-name">${shortcut.name}</div>
                 <div class="omnisearch-shortcut-keyword">${keyword}</div>
+                <div class="omnisearch-shortcut-type">${typeLabel}</div>
+            </div>
+            <div class="omnisearch-shortcut-actions">
+                <label class="omnisearch-toggle-switch">
+                    <input type="checkbox" ${shortcut.enabled ? 'checked' : ''} onchange="toggleShortcut('${keyword}')">
+                    <span class="omnisearch-toggle-slider"></span>
+                </label>
+                <button class="omnisearch-btn omnisearch-btn-edit" onclick="editShortcut('${keyword}')">Edit</button>
+                <button class="omnisearch-btn omnisearch-btn-danger" onclick="deleteShortcut('${keyword}')">Delete</button>
             </div>
         `;
 
@@ -693,6 +980,520 @@ body.omnisearch-sidebar-open {
             }
         });
     }
+
+    // Toggle shortcut enabled/disabled
+    function toggleShortcut(keyword) {
+        if (shortcuts[keyword]) {
+            shortcuts[keyword].enabled = !shortcuts[keyword].enabled;
+            saveShortcuts();
+            renderShortcuts();
+            renderKeywordsHelp();
+        }
+    }
+
+    // Edit shortcut - open a simple edit modal
+    function editShortcut(keyword) {
+        const shortcut = shortcuts[keyword];
+        if (!shortcut) return;
+
+        if (shortcut.type === 'advanced') {
+            openAdvancedEditModal(keyword, shortcut);
+        } else {
+            openSimpleEditModal(keyword, shortcut);
+        }
+    }
+
+    // Delete shortcut with confirmation
+    function deleteShortcut(keyword) {
+        const shortcut = shortcuts[keyword];
+        if (!shortcut) return;
+
+        if (confirm(`Are you sure you want to delete the "${shortcut.name}" shortcut?`)) {
+            delete shortcuts[keyword];
+            saveShortcuts();
+            renderShortcuts();
+            renderKeywordsHelp();
+            showNotification(`Deleted "${shortcut.name}" shortcut`, 'success');
+        }
+    }
+
+    // Save shortcuts to background script
+    function saveShortcuts() {
+        chrome.runtime.sendMessage({
+            action: 'updateShortcuts',
+            shortcuts: shortcuts
+        }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error('Error saving shortcuts:', chrome.runtime.lastError);
+                showNotification('Failed to save changes', 'error');
+            }
+        });
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `omnisearch-notification omnisearch-notification-${type}`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('omnisearch-notification-show');
+        }, 10);
+        
+        setTimeout(() => {
+            notification.classList.remove('omnisearch-notification-show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Open simple edit modal
+    function openSimpleEditModal(keyword, shortcut) {
+        const modal = createSimpleEditModal(keyword, shortcut);
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.classList.add('omnisearch-modal-show');
+            modal.querySelector('input').focus();
+        }, 10);
+    }
+
+    // Open advanced edit modal  
+    function openAdvancedEditModal(keyword, shortcut) {
+        const modal = createAdvancedEditModal(keyword, shortcut);
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.classList.add('omnisearch-modal-show');
+            modal.querySelector('input').focus();
+        }, 10);
+    }
+
+    // Create simple edit modal
+    function createSimpleEditModal(keyword, shortcut) {
+        const modal = document.createElement('div');
+        modal.className = 'omnisearch-modal-overlay';
+        
+        modal.innerHTML = `
+            <div class="omnisearch-modal">
+                <div class="omnisearch-modal-header">
+                    <h3>Edit Simple Shortcut</h3>
+                    <button class="omnisearch-modal-close">&times;</button>
+                </div>
+                <div class="omnisearch-modal-body">
+                    <div class="omnisearch-form-group">
+                        <label>Keyword:</label>
+                        <input type="text" id="edit-keyword" value="${keyword}" placeholder="e.g., youtube">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Name:</label>
+                        <input type="text" id="edit-name" value="${shortcut.name}" placeholder="e.g., YouTube">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Search URL:</label>
+                        <input type="text" id="edit-url" value="${shortcut.url}" placeholder="e.g., https://youtube.com/results?search_query=%s">
+                        <small>Use %s as placeholder for search terms</small>
+                    </div>
+                </div>
+                <div class="omnisearch-modal-footer">
+                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveSimpleEdit('${keyword}', this)">Save</button>
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const closeBtn = modal.querySelector('.omnisearch-modal-close');
+        closeBtn.addEventListener('click', () => closeModal(closeBtn));
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(closeBtn);
+            }
+        });
+
+        return modal;
+    }
+
+    // Create advanced edit modal
+    function createAdvancedEditModal(keyword, shortcut) {
+        const modal = document.createElement('div');
+        modal.className = 'omnisearch-modal-overlay';
+        
+        modal.innerHTML = `
+            <div class="omnisearch-modal omnisearch-modal-wide">
+                <div class="omnisearch-modal-header">
+                    <h3>Edit Advanced Shortcut</h3>
+                    <button class="omnisearch-modal-close">&times;</button>
+                </div>
+                <div class="omnisearch-modal-body">
+                    <div class="omnisearch-form-group">
+                        <label>Keyword:</label>
+                        <input type="text" id="edit-keyword" value="${keyword}" placeholder="e.g., ai">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Name:</label>
+                        <input type="text" id="edit-name" value="${shortcut.name}" placeholder="e.g., AI Studio">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Page URL:</label>
+                        <input type="text" id="edit-url" value="${shortcut.url}" placeholder="e.g., https://aistudio.google.com/prompts/new_chat">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Input Selector:</label>
+                        <input type="text" id="edit-input-selector" value="${shortcut.inputSelector}" placeholder="e.g., textarea">
+                        <small>CSS selector for the input field</small>
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Button Selector:</label>
+                        <input type="text" id="edit-button-selector" value="${shortcut.buttonSelector}" placeholder="e.g., button[aria-label*='Run']">
+                        <small>CSS selector for the submit button</small>
+                    </div>
+                </div>
+                <div class="omnisearch-modal-footer">
+                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveAdvancedEdit('${keyword}', this)">Save</button>
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const closeBtn = modal.querySelector('.omnisearch-modal-close');
+        closeBtn.addEventListener('click', () => closeModal(closeBtn));
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(closeBtn);
+            }
+        });
+
+        return modal;
+    }
+
+    // Close modal
+    function closeModal(button) {
+        const modal = button.closest('.omnisearch-modal-overlay');
+        modal.classList.remove('omnisearch-modal-show');
+        setTimeout(() => {
+            if (modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+        }, 300);
+    }
+
+    // Save simple edit
+    function saveSimpleEdit(originalKeyword, button) {
+        const modal = button.closest('.omnisearch-modal');
+        const newKeyword = modal.querySelector('#edit-keyword').value.toLowerCase().trim();
+        const name = modal.querySelector('#edit-name').value.trim();
+        const url = modal.querySelector('#edit-url').value.trim();
+
+        if (!newKeyword || !name || !url) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+        }
+
+        if (!url.includes('%s')) {
+            showNotification('URL must contain %s placeholder', 'error');
+            return;
+        }
+
+        // Check for keyword conflicts
+        if (newKeyword !== originalKeyword && shortcuts[newKeyword]) {
+            showNotification('Keyword already exists', 'error');
+            return;
+        }
+
+        // Remove old shortcut if keyword changed
+        if (newKeyword !== originalKeyword) {
+            delete shortcuts[originalKeyword];
+        }
+
+        // Save updated shortcut
+        shortcuts[newKeyword] = {
+            ...shortcuts[originalKeyword] || {},
+            name: name,
+            url: url,
+            icon: `https://www.google.com/s2/favicons?domain=${new URL(url.replace('%s', 'test')).hostname}`
+        };
+
+        saveShortcuts();
+        renderShortcuts();
+        renderKeywordsHelp();
+        closeModal(button);
+        showNotification('Shortcut updated successfully', 'success');
+    }
+
+    // Save advanced edit
+    function saveAdvancedEdit(originalKeyword, button) {
+        const modal = button.closest('.omnisearch-modal');
+        const newKeyword = modal.querySelector('#edit-keyword').value.toLowerCase().trim();
+        const name = modal.querySelector('#edit-name').value.trim();
+        const url = modal.querySelector('#edit-url').value.trim();
+        const inputSelector = modal.querySelector('#edit-input-selector').value.trim();
+        const buttonSelector = modal.querySelector('#edit-button-selector').value.trim();
+
+        if (!newKeyword || !name || !url || !inputSelector || !buttonSelector) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+        }
+
+        // Check for keyword conflicts
+        if (newKeyword !== originalKeyword && shortcuts[newKeyword]) {
+            showNotification('Keyword already exists', 'error');
+            return;
+        }
+
+        // Remove old shortcut if keyword changed
+        if (newKeyword !== originalKeyword) {
+            delete shortcuts[originalKeyword];
+        }
+
+        // Save updated shortcut
+        shortcuts[newKeyword] = {
+            ...shortcuts[originalKeyword] || {},
+            name: name,
+            url: url,
+            type: 'advanced',
+            inputSelector: inputSelector,
+            buttonSelector: buttonSelector,
+            icon: `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`
+        };
+
+        saveShortcuts();
+        renderShortcuts();
+        renderKeywordsHelp();
+        closeModal(button);
+        showNotification('Advanced shortcut updated successfully', 'success');
+    }
+
+    // Add new shortcut
+    function addNewShortcut(type) {
+        if (type === 'simple') {
+            const modal = createAddSimpleModal();
+            document.body.appendChild(modal);
+            setTimeout(() => {
+                modal.classList.add('omnisearch-modal-show');
+                modal.querySelector('input').focus();
+            }, 10);
+        } else if (type === 'advanced') {
+            const modal = createAddAdvancedModal();
+            document.body.appendChild(modal);
+            setTimeout(() => {
+                modal.classList.add('omnisearch-modal-show');
+                modal.querySelector('input').focus();
+            }, 10);
+        }
+    }
+
+    // Create add simple modal
+    function createAddSimpleModal() {
+        const modal = document.createElement('div');
+        modal.className = 'omnisearch-modal-overlay';
+        
+        modal.innerHTML = `
+            <div class="omnisearch-modal">
+                <div class="omnisearch-modal-header">
+                    <h3>Add Simple Shortcut</h3>
+                    <button class="omnisearch-modal-close">&times;</button>
+                </div>
+                <div class="omnisearch-modal-body">
+                    <div class="omnisearch-form-group">
+                        <label>Keyword:</label>
+                        <input type="text" id="add-keyword" placeholder="e.g., youtube">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Name:</label>
+                        <input type="text" id="add-name" placeholder="e.g., YouTube">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Search URL:</label>
+                        <input type="text" id="add-url" placeholder="e.g., https://youtube.com/results?search_query=%s">
+                        <small>Use %s as placeholder for search terms</small>
+                    </div>
+                </div>
+                <div class="omnisearch-modal-footer">
+                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveNewSimple(this)">Add Shortcut</button>
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const closeBtn = modal.querySelector('.omnisearch-modal-close');
+        closeBtn.addEventListener('click', () => closeModal(closeBtn));
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(closeBtn);
+            }
+        });
+
+        return modal;
+    }
+
+    // Create add advanced modal
+    function createAddAdvancedModal() {
+        const modal = document.createElement('div');
+        modal.className = 'omnisearch-modal-overlay';
+        
+        modal.innerHTML = `
+            <div class="omnisearch-modal omnisearch-modal-wide">
+                <div class="omnisearch-modal-header">
+                    <h3>Add Advanced Shortcut</h3>
+                    <button class="omnisearch-modal-close">&times;</button>
+                </div>
+                <div class="omnisearch-modal-body">
+                    <div class="omnisearch-form-group">
+                        <label>Keyword:</label>
+                        <input type="text" id="add-keyword" placeholder="e.g., ai">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Name:</label>
+                        <input type="text" id="add-name" placeholder="e.g., AI Studio">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Page URL:</label>
+                        <input type="text" id="add-url" placeholder="e.g., https://aistudio.google.com/prompts/new_chat">
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Input Selector:</label>
+                        <input type="text" id="add-input-selector" placeholder="e.g., textarea">
+                        <small>CSS selector for the input field</small>
+                    </div>
+                    <div class="omnisearch-form-group">
+                        <label>Button Selector:</label>
+                        <input type="text" id="add-button-selector" placeholder="e.g., button[aria-label*='Run']">
+                        <small>CSS selector for the submit button</small>
+                    </div>
+                </div>
+                <div class="omnisearch-modal-footer">
+                    <button class="omnisearch-btn omnisearch-btn-secondary" onclick="closeModal(this)">Cancel</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" onclick="saveNewAdvanced(this)">Add Shortcut</button>
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const closeBtn = modal.querySelector('.omnisearch-modal-close');
+        closeBtn.addEventListener('click', () => closeModal(closeBtn));
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(closeBtn);
+            }
+        });
+
+        return modal;
+    }
+
+    // Save new simple shortcut
+    function saveNewSimple(button) {
+        const modal = button.closest('.omnisearch-modal');
+        const keyword = modal.querySelector('#add-keyword').value.toLowerCase().trim();
+        const name = modal.querySelector('#add-name').value.trim();
+        const url = modal.querySelector('#add-url').value.trim();
+
+        if (!keyword || !name || !url) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+        }
+
+        if (!url.includes('%s')) {
+            showNotification('URL must contain %s placeholder', 'error');
+            return;
+        }
+
+        // Check for keyword conflicts
+        if (shortcuts[keyword]) {
+            showNotification('Keyword already exists', 'error');
+            return;
+        }
+
+        // Validate keyword format
+        if (!/^[a-z0-9]+$/.test(keyword)) {
+            showNotification('Keyword can only contain lowercase letters and numbers', 'error');
+            return;
+        }
+
+        // Save new shortcut
+        shortcuts[keyword] = {
+            name: name,
+            url: url,
+            enabled: true,
+            type: 'simple',
+            icon: `https://www.google.com/s2/favicons?domain=${new URL(url.replace('%s', 'test')).hostname}`
+        };
+
+        saveShortcuts();
+        renderShortcuts();
+        renderKeywordsHelp();
+        closeModal(button);
+        showNotification(`Added "${name}" shortcut successfully`, 'success');
+    }
+
+    // Save new advanced shortcut
+    function saveNewAdvanced(button) {
+        const modal = button.closest('.omnisearch-modal');
+        const keyword = modal.querySelector('#add-keyword').value.toLowerCase().trim();
+        const name = modal.querySelector('#add-name').value.trim();
+        const url = modal.querySelector('#add-url').value.trim();
+        const inputSelector = modal.querySelector('#add-input-selector').value.trim();
+        const buttonSelector = modal.querySelector('#add-button-selector').value.trim();
+
+        if (!keyword || !name || !url || !inputSelector || !buttonSelector) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+        }
+
+        // Check for keyword conflicts
+        if (shortcuts[keyword]) {
+            showNotification('Keyword already exists', 'error');
+            return;
+        }
+
+        // Validate keyword format
+        if (!/^[a-z0-9]+$/.test(keyword)) {
+            showNotification('Keyword can only contain lowercase letters and numbers', 'error');
+            return;
+        }
+
+        // Save new shortcut
+        shortcuts[keyword] = {
+            name: name,
+            url: url,
+            enabled: true,
+            type: 'advanced',
+            inputSelector: inputSelector,
+            buttonSelector: buttonSelector,
+            icon: `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`
+        };
+
+        saveShortcuts();
+        renderShortcuts();
+        renderKeywordsHelp();
+        closeModal(button);
+        showNotification(`Added advanced "${name}" shortcut successfully`, 'success');
+    }
+
+    // Make functions globally available for onclick handlers
+    window.toggleShortcut = toggleShortcut;
+    window.editShortcut = editShortcut;
+    window.deleteShortcut = deleteShortcut;
+    window.closeModal = closeModal;
+    window.saveSimpleEdit = saveSimpleEdit;
+    window.saveAdvancedEdit = saveAdvancedEdit;
+    window.saveNewSimple = saveNewSimple;
+    window.saveNewAdvanced = saveNewAdvanced;
 
     // Listen for messages from background script
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
