@@ -823,13 +823,6 @@ input:checked + .omnisearch-toggle-slider:before {
             e.stopPropagation();
         });
 
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (isOpen && !sidebar.contains(e.target)) {
-                closeSidebar();
-            }
-        });
-
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             // ESC to close
@@ -1196,24 +1189,35 @@ input:checked + .omnisearch-toggle-slider:before {
                 <div class="omnisearch-modal-body">
                     <div class="omnisearch-form-group">
                         <label>Keyword:</label>
-                        <input type="text" id="edit-keyword" value="${keyword}" placeholder="e.g., youtube">
+                        <input type="text" id="edit-keyword" placeholder="e.g., youtube">
                     </div>
                     <div class="omnisearch-form-group">
                         <label>Name:</label>
-                        <input type="text" id="edit-name" value="${shortcut.name}" placeholder="e.g., YouTube">
+                        <input type="text" id="edit-name" placeholder="e.g., YouTube">
                     </div>
                     <div class="omnisearch-form-group">
                         <label>Search URL:</label>
-                        <input type="text" id="edit-url" value="${shortcut.url}" placeholder="e.g., https://youtube.com/results?search_query=%s">
+                        <input type="text" id="edit-url" placeholder="e.g., https://youtube.com/results?search_query=%s">
                         <small>Use %s as placeholder for search terms</small>
                     </div>
                 </div>
                 <div class="omnisearch-modal-footer">
                     <button class="omnisearch-btn omnisearch-btn-secondary" data-action="close-modal">Cancel</button>
-                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-simple-edit" data-original-keyword="${keyword}">Save</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-simple-edit">Save</button>
                 </div>
             </div>
         `;
+
+        // Set values safely using DOM properties instead of HTML attributes
+        const keywordInput = modal.querySelector('#edit-keyword');
+        const nameInput = modal.querySelector('#edit-name');
+        const urlInput = modal.querySelector('#edit-url');
+        const saveButton = modal.querySelector('[data-action="save-simple-edit"]');
+
+        keywordInput.value = keyword || '';
+        nameInput.value = shortcut.name || '';
+        urlInput.value = shortcut.url || '';
+        saveButton.setAttribute('data-original-keyword', keyword);
 
         // Add event listeners
         const closeBtn = modal.querySelector('.omnisearch-modal-close');
@@ -1227,6 +1231,16 @@ input:checked + .omnisearch-toggle-slider:before {
         });
 
         return modal;
+    }
+
+    // HTML escape function to safely insert values into HTML attributes
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#x27;');
     }
 
     // Create advanced edit modal
@@ -1243,33 +1257,48 @@ input:checked + .omnisearch-toggle-slider:before {
                 <div class="omnisearch-modal-body">
                     <div class="omnisearch-form-group">
                         <label>Keyword:</label>
-                        <input type="text" id="edit-keyword" value="${keyword}" placeholder="e.g., ai">
+                        <input type="text" id="edit-keyword" placeholder="e.g., ai">
                     </div>
                     <div class="omnisearch-form-group">
                         <label>Name:</label>
-                        <input type="text" id="edit-name" value="${shortcut.name}" placeholder="e.g., AI Studio">
+                        <input type="text" id="edit-name" placeholder="e.g., AI Studio">
                     </div>
                     <div class="omnisearch-form-group">
                         <label>Page URL:</label>
-                        <input type="text" id="edit-url" value="${shortcut.url}" placeholder="e.g., https://aistudio.google.com/prompts/new_chat">
+                        <input type="text" id="edit-url" placeholder="e.g., https://aistudio.google.com/prompts/new_chat">
                     </div>
                     <div class="omnisearch-form-group">
                         <label>Input Selector:</label>
-                        <input type="text" id="edit-input-selector" value="${shortcut.inputSelector}" placeholder="e.g., textarea">
+                        <input type="text" id="edit-input-selector" placeholder="e.g., textarea">
                         <small>CSS selector for the input field</small>
                     </div>
                     <div class="omnisearch-form-group">
                         <label>Button Selector:</label>
-                        <input type="text" id="edit-button-selector" value="${shortcut.buttonSelector}" placeholder="e.g., button[aria-label*='Run']">
+                        <input type="text" id="edit-button-selector" placeholder="e.g., button[aria-label*='Run']">
                         <small>CSS selector for the submit button</small>
                     </div>
                 </div>
                 <div class="omnisearch-modal-footer">
                     <button class="omnisearch-btn omnisearch-btn-secondary" data-action="close-modal">Cancel</button>
-                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-advanced-edit" data-original-keyword="${keyword}">Save</button>
+                    <button class="omnisearch-btn omnisearch-btn-primary" data-action="save-advanced-edit">Save</button>
                 </div>
             </div>
         `;
+
+        // Set values safely using DOM properties instead of HTML attributes
+        const keywordInput = modal.querySelector('#edit-keyword');
+        const nameInput = modal.querySelector('#edit-name');
+        const urlInput = modal.querySelector('#edit-url');
+        const inputSelectorInput = modal.querySelector('#edit-input-selector');
+        const buttonSelectorInput = modal.querySelector('#edit-button-selector');
+        const saveButton = modal.querySelector('[data-action="save-advanced-edit"]');
+
+        keywordInput.value = keyword || '';
+        nameInput.value = shortcut.name || '';
+        urlInput.value = shortcut.url || '';
+        inputSelectorInput.value = shortcut.inputSelector || '';
+        buttonSelectorInput.value = shortcut.buttonSelector || '';
+        saveButton.setAttribute('data-original-keyword', keyword);
 
         // Add event listeners
         const closeBtn = modal.querySelector('.omnisearch-modal-close');

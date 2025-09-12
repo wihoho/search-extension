@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Selector Input Fix</title>
+    <style>
+        body {
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-box {
+            background: #f0f0f0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Input Selector Fix Test</h1>
+    
+    <div class="test-box">
+        <h2>Test Complex Selectors</h2>
+        <p>These selectors contain quotes and special characters that previously caused display issues:</p>
+        
+        <button class="test-button" onclick="testSimpleSelector()">Test Simple Selector</button>
+        <button class="test-button" onclick="testXPathSelector()">Test XPath Selector</button>
+        <button class="test-button" onclick="testComplexCSSSelector()">Test Complex CSS Selector</button>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <!-- Mock chrome extension API for testing -->
+    <script>
+        // Mock chrome API
+        window.chrome = window.chrome || {
+            runtime: {
+                getURL: (path) => `./${path}`,
+                sendMessage: (message, callback) => {
+                    console.log('Mock sendMessage:', message);
+                    if (message.action === 'getShortcuts') {
+                        setTimeout(() => callback({ shortcuts: window.testShortcuts }), 50);
+                    } else if (message.action === 'updateShortcuts') {
+                        setTimeout(() => callback({ success: true }), 50);
+                    }
+                    return true;
+                },
+                onMessage: {
+                    addListener: (callback) => {
+                        window.mockMessageListener = callback;
+                    }
+                }
+            }
+        };
+
+        // Test shortcuts with problematic selectors
+        window.testShortcuts = {
+            'simple': {
+                name: 'Simple Test',
+                url: 'https://example.com/search?q=%s',
+                enabled: true,
+                type: 'simple'
+            },
+            'xpath': {
+                name: 'XPath Test',
+                url: 'https://example.com/',
+                inputSelector: '//*[@id="search-input"]',
+                buttonSelector: '//button[@class="search-btn"]',
+                enabled: true,
+                type: 'advanced'
+            },
+            'complex': {
+                name: 'Complex CSS Test',
+                url: 'https://example.com/',
+                inputSelector: 'input[data-testid="search"][aria-label="Search input"]',
+                buttonSelector: 'button[type="submit"].primary-btn:not([disabled])',
+                enabled: true,
+                type: 'advanced'
+            }
+        };
+
+        function addTestResult(message) {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = 'test-result';
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function testSimpleSelector() {
+            addTestResult('Testing simple shortcut with URL: ' + window.testShortcuts.simple.url);
+            if (window.editShortcut) {
+                window.editShortcut('simple');
+            } else {
+                addTestResult('ERROR: editShortcut function not available');
+            }
+        }
+
+        function testXPathSelector() {
+            const shortcut = window.testShortcuts.xpath;
+            addTestResult('Testing XPath selector: ' + shortcut.inputSelector);
+            addTestResult('Testing XPath button selector: ' + shortcut.buttonSelector);
+            if (window.editShortcut) {
+                window.editShortcut('xpath');
+            } else {
+                addTestResult('ERROR: editShortcut function not available');
+            }
+        }
+
+        function testComplexCSSSelector() {
+            const shortcut = window.testShortcuts.complex;
+            addTestResult('Testing complex CSS selector: ' + shortcut.inputSelector);
+            addTestResult('Testing complex button selector: ' + shortcut.buttonSelector);
+            if (window.editShortcut) {
+                window.editShortcut('complex');
+            } else {
+                addTestResult('ERROR: editShortcut function not available');
+            }
+        }
+
+        // Load the sidebar script
+        document.addEventListener('DOMContentLoaded', () => {
+            const script = document.createElement('script');
+            script.src = 'sidebar.js';
+            script.onload = () => {
+                addTestResult('✓ Sidebar script loaded successfully');
+                // Trigger sidebar injection
+                if (window.mockMessageListener) {
+                    window.mockMessageListener({ action: 'openSidebar' });
+                }
+            };
+            script.onerror = () => {
+                addTestResult('✗ Error loading sidebar script');
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>
