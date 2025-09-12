@@ -42,6 +42,7 @@ const HIGHLIGHT_STYLES = `
     background: rgba(0, 0, 0, 0.2) !important;
     z-index: 9999 !important;
     cursor: crosshair !important;
+    pointer-events: none !important;
   }
   
   .omnisearch-instructions {
@@ -130,7 +131,12 @@ function getElementDescription(element) {
 
 // Start element selection mode
 function startElementSelection(type, callback) {
-  if (isSelectionMode) return;
+  console.log('Starting element selection for type:', type);
+  
+  if (isSelectionMode) {
+    console.log('Already in selection mode, ignoring request');
+    return;
+  }
   
   isSelectionMode = true;
   selectionCallback = callback;
@@ -141,22 +147,24 @@ function startElementSelection(type, callback) {
   overlayElement = document.createElement('div');
   overlayElement.className = 'omnisearch-overlay';
   document.body.appendChild(overlayElement);
+  console.log('Created overlay element');
   
   // Create instructions
   const instructions = document.createElement('div');
   instructions.className = 'omnisearch-instructions';
   instructions.textContent = `Click on a ${type} element to select it. Press ESC to cancel.`;
   document.body.appendChild(instructions);
+  console.log('Created instructions element');
   
   // Add event listeners
   document.addEventListener('mouseover', handleMouseOver, true);
   document.addEventListener('mouseout', handleMouseOut, true);
   document.addEventListener('click', handleClick, true);
   document.addEventListener('keydown', handleKeyDown, true);
+  console.log('Added event listeners for element selection');
   
-  // Prevent page interactions
-  document.body.style.pointerEvents = 'none';
-  overlayElement.style.pointerEvents = 'auto';
+  // Don't disable pointer events on body since overlay now has pointer-events: none
+  // This allows clicks to reach the target elements while overlay provides visual feedback
 }
 
 // Stop element selection mode
@@ -185,8 +193,7 @@ function stopElementSelection() {
   if (overlay) overlay.remove();
   if (instructions) instructions.remove();
   
-  // Restore page interactions
-  document.body.style.pointerEvents = '';
+  // No need to restore pointer events since we didn't disable them
 }
 
 // Handle mouse over events
@@ -194,8 +201,9 @@ function handleMouseOver(event) {
   if (!isSelectionMode) return;
   
   const element = event.target;
-  if (element === overlayElement || element.classList.contains('omnisearch-overlay') || 
-      element.classList.contains('omnisearch-instructions')) {
+  
+  // Skip if user is hovering over instructions
+  if (element.classList.contains('omnisearch-instructions')) {
     return;
   }
   
@@ -224,8 +232,9 @@ function handleClick(event) {
   event.stopPropagation();
   
   const element = event.target;
-  if (element === overlayElement || element.classList.contains('omnisearch-overlay') || 
-      element.classList.contains('omnisearch-instructions')) {
+  
+  // Skip if user clicked on instructions (they still need pointer events)
+  if (element.classList.contains('omnisearch-instructions')) {
     return;
   }
   
@@ -264,9 +273,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('Element selector received message:', request);
   
   if (request.action === 'startElementSelection') {
+    console.log('Processing startElementSelection request');
     const { type } = request;
     
     startElementSelection(type, (result) => {
+      console.log('Element selection completed, sending response:', result);
       sendResponse(result);
     });
     
@@ -274,12 +285,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.action === 'stopElementSelection') {
+    console.log('Processing stopElementSelection request');
     stopElementSelection();
     sendResponse({ success: true });
   }
   
   // Handle existing automation requests
   if (request.type === 'OMNISEARCH_AUTOMATE') {
+    console.log('OMNISEARCH_AUTOMATE request - delegating to automation-script.js');
     // This is handled by automation-script.js
     return false;
   }
