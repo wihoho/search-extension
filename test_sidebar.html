@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniSearch Sidebar Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .instructions {
+            background: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+        .status {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>🔍 OmniSearch Sidebar Test Page</h1>
+        
+        <div class="instructions">
+            <h3>📋 How to Test the Sidebar</h3>
+            <ol>
+                <li><strong>Load the Extension:</strong> Go to <code>chrome://extensions/</code>, enable Developer mode, and load the extension</li>
+                <li><strong>Open Sidebar:</strong> Click the OmniSearch extension icon in the toolbar</li>
+                <li><strong>Keyboard Shortcut:</strong> Use <kbd>Ctrl+Shift+S</kbd> (or <kbd>Cmd+Shift+S</kbd> on Mac)</li>
+                <li><strong>Test Features:</strong> Try adding custom shortcuts, toggling settings, and switching tabs</li>
+                <li><strong>Verify No Blocking:</strong> Ensure the sidebar doesn't block this content</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Content Area 1</h2>
+            <p>This is a test paragraph to verify that the sidebar doesn't interfere with page content. The sidebar should slide in from the right side of the screen and not block or overlay this text.</p>
+            
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 Interactive Elements</h2>
+            <button onclick="alert('Button clicked!')">Test Button</button>
+            <input type="text" placeholder="Test input field" style="margin: 10px;">
+            <select style="margin: 10px;">
+                <option>Option 1</option>
+                <option>Option 2</option>
+            </select>
+            
+            <p><strong>Verify:</strong> These elements should remain fully interactive even when the sidebar is open.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Long Content</h2>
+            <p>This section tests how the sidebar behaves with longer content that might require scrolling.</p>
+            
+            <div style="height: 800px; background: linear-gradient(to bottom, #f0f0f0, #e0e0e0); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #666;">
+                <div style="text-align: center;">
+                    <div>Scrollable Content Area</div>
+                    <div style="font-size: 14px; margin-top: 10px;">The sidebar should not interfere with scrolling</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ Test Checklist</h2>
+            <div style="display: grid; gap: 10px;">
+                <label><input type="checkbox"> Sidebar opens without blocking page content</label>
+                <label><input type="checkbox"> Sidebar slides in smoothly from the right</label>
+                <label><input type="checkbox"> Can toggle sidebar with extension icon</label>
+                <label><input type="checkbox"> Can toggle sidebar with keyboard shortcut</label>
+                <label><input type="checkbox"> Can add custom shortcuts</label>
+                <label><input type="checkbox"> Can edit existing shortcuts</label>
+                <label><input type="checkbox"> Can delete shortcuts</label>
+                <label><input type="checkbox"> Help tab works correctly</label>
+                <label><input type="checkbox"> Sidebar closes when clicking outside</label>
+                <label><input type="checkbox"> Sidebar closes with ESC key</label>
+                <label><input type="checkbox"> Page elements remain interactive</label>
+                <label><input type="checkbox"> Page scrolling works normally</label>
+            </div>
+        </div>
+
+        <div class="status" id="status">
+            ✨ Ready for testing! Click the extension icon or use the keyboard shortcut.
+        </div>
+    </div>
+
+    <script>
+        // Simple script to test JS functionality isn't broken
+        console.log('🧪 Test page loaded successfully');
+        
+        // Add some dynamic content to test interactions
+        document.getElementById('status').addEventListener('click', function() {
+            this.textContent = '🎉 Page interactions working correctly!';
+            setTimeout(() => {
+                this.textContent = '✨ Ready for testing! Click the extension icon or use the keyboard shortcut.';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
