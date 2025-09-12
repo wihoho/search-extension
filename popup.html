@@ -136,6 +136,26 @@
                         <p>Add your own search shortcuts by clicking the "+ Add Custom" button. Use <code>%s</code> as a placeholder for the search query in the URL.</p>
                         <p><strong>Example:</strong> <code>https://example.com/search?q=%s</code></p>
                     </div>
+
+                    <div class="help-item">
+                        <h3>Advanced Shortcuts with Element Selectors</h3>
+                        <p>For complex websites that require automation (like AI tools), you can use advanced shortcuts with element selectors.</p>
+                        <p><strong>CSS Selectors:</strong></p>
+                        <ul>
+                            <li><code>textarea</code> - Select by tag</li>
+                            <li><code>#searchInput</code> - Select by ID</li>
+                            <li><code>.search-input</code> - Select by class</li>
+                            <li><code>input[placeholder="Search"]</code> - Select by attribute</li>
+                        </ul>
+                        <p><strong>XPath Selectors (More Reliable):</strong></p>
+                        <ul>
+                            <li><code>//textarea</code> - Select any textarea</li>
+                            <li><code>//*[@id='searchInput']</code> - Select by ID</li>
+                            <li><code>//input[@placeholder='Search']</code> - Select by attribute</li>
+                            <li><code>//button[text()='Submit']</code> - Select by text content</li>
+                            <li><code>//button[contains(@aria-label,'Run')]</code> - Select by partial attribute match</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -193,8 +213,8 @@
                         <div class="element-selector-row">
                             <div class="element-field">
                                 <label for="input-selector">Input Element Selector</label>
-                                <input type="text" id="input-selector" placeholder="textarea, input[type='text'], etc.">
-                                <small>CSS selector for the search input field</small>
+                                <input type="text" id="input-selector" placeholder="textarea, //input[@type='text'], etc.">
+                                <small>CSS selector or XPath for the search input field</small>
                             </div>
                             <button type="button" class="btn btn-select" id="select-input-btn">
                                 🎯 Select on Page
@@ -204,8 +224,8 @@
                         <div class="element-selector-row">
                             <div class="element-field">
                                 <label for="button-selector">Submit Button Selector</label>
-                                <input type="text" id="button-selector" placeholder="button[type='submit'], .search-btn, etc.">
-                                <small>CSS selector for the submit button</small>
+                                <input type="text" id="button-selector" placeholder="button[type='submit'], //button[text()='Search'], etc.">
+                                <small>CSS selector or XPath for the submit button</small>
                             </div>
                             <button type="button" class="btn btn-select" id="select-button-btn">
                                 🎯 Select on Page
