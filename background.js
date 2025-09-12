@@ -313,6 +313,47 @@ chrome.runtime.onStartup.addListener(async () => {
   await loadShortcuts();
 });
 
+// Handle action click (extension icon click)
+chrome.action.onClicked.addListener(async (tab) => {
+  debugLog('Extension icon clicked, toggling sidebar on tab:', tab.id);
+  await toggleSidebar(tab.id);
+});
+
+// Handle keyboard shortcut
+chrome.commands.onCommand.addListener(async (command) => {
+  debugLog('Command received:', command);
+  
+  if (command === 'toggle-sidebar') {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab) {
+      await toggleSidebar(tab.id);
+    }
+  }
+});
+
+// Helper function to toggle sidebar
+async function toggleSidebar(tabId) {
+  try {
+    // Send message to content script to toggle sidebar
+    await chrome.tabs.sendMessage(tabId, { action: 'toggleSidebar' });
+  } catch (error) {
+    debugLog('Error toggling sidebar:', error);
+    // If content script isn't ready, inject it first
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        files: ['sidebar.js']
+      });
+      // Then try to send the message again
+      setTimeout(() => {
+        chrome.tabs.sendMessage(tabId, { action: 'toggleSidebar' });
+      }, 100);
+    } catch (injectError) {
+      console.error('OmniSearch: Failed to inject or toggle sidebar:', injectError);
+    }
+  }
+}
+
 // Ensure shortcuts are loaded when service worker becomes active
 (async () => {
   debugLog('Service worker activated, loading shortcuts...');
