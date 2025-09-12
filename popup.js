@@ -47,8 +47,8 @@ function editShortcut(keyword) {
         // Trigger type change to show/hide appropriate fields
         handleShortcutTypeChange();
 
-        // Disable keyword field for editing
-        document.getElementById('shortcut-keyword').disabled = true;
+        // Enable keyword field for editing (allow editing default shortcuts)
+        document.getElementById('shortcut-keyword').disabled = false;
 
         openModal();
     } catch (error) {
@@ -341,9 +341,19 @@ async function handleFormSubmit(e) {
             return;
         }
 
-        if (!editingShortcut && shortcuts[keyword]) {
-            alert('A shortcut with this keyword already exists.');
-            return;
+        // Check for keyword conflicts
+        if (editingShortcut) {
+            // When editing, only check for conflict if the keyword has changed
+            if (keyword !== editingShortcut && shortcuts[keyword]) {
+                alert(`A shortcut with keyword "${keyword}" already exists. Please choose a different keyword.`);
+                return;
+            }
+        } else {
+            // When adding new shortcut, check for any existing keyword
+            if (shortcuts[keyword]) {
+                alert(`A shortcut with keyword "${keyword}" already exists. Please choose a different keyword.`);
+                return;
+            }
         }
 
         let shortcutData = {
@@ -404,6 +414,11 @@ async function handleFormSubmit(e) {
         // Determine if this is an edit or new shortcut
         const isEditing = editingShortcut !== null;
         const actionText = isEditing ? 'updated' : 'added';
+
+        // If editing and keyword changed, remove the old entry
+        if (isEditing && keyword !== editingShortcut) {
+            delete shortcuts[editingShortcut];
+        }
 
         // Save shortcut
         shortcuts[keyword] = shortcutData;
