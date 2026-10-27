@@ -1,0 +1,18 @@
+Durchsuche jede Website direkt aus der Adressleiste von Chrome. Tippe os, drücke Leertaste oder Tab und dann ein Kürzel und deinen Suchbegriff, etwa „youtube katzen“. OmniSearch öffnet die Ergebnisse sofort.
+
+FUNKTIONEN
+• 10 fertige Kürzel für beliebte Websites, von Video und E-Mail bis Shopping und Nachschlagewerken. Alle lassen sich in der Seitenleiste ansehen und bearbeiten.
+• Eigene Kürzel für jede Website mit Suchseite: ein Kürzel und eine Such-URL mit %s an der Stelle des Suchbegriffs angeben.
+• Erweiterte Kürzel für Websites ohne Such-URL, zum Beispiel KI-Chats: OmniSearch öffnet die Seite, tippt deinen Text in das gewählte Feld und klickt den Button für dich.
+• Eine Seitenleiste für alle Einstellungen: auf das Symbol in der Symbolleiste klicken oder Strg+Umschalt+S drücken (Cmd+Shift+S auf dem Mac). Sie gleitet von rechts herein, ohne die Seite zu verdecken.
+• Kürzel jederzeit ein- und ausschalten, bearbeiten oder löschen.
+
+SO GEHT'S
+1. os in die Adressleiste tippen und Leertaste oder Tab drücken.
+2. Kürzel und Suchbegriff eingeben, zum Beispiel: youtube pasta kochen
+3. Enter drücken.
+
+DATENSCHUTZ
+Deine Kürzel werden im Speicher von Chrome gesichert und mit deinem Chrome-Profil synchronisiert. OmniSearch hat kein Konto, keine Werbung und kein Tracking und erfasst oder sendet nicht den Inhalt der Seiten, die du besuchst. Es öffnet nur die Suchseite, die du anforderst, und ein erweitertes Kürzel tippt nur auf der Website, für die du es eingerichtet hast.
+
+Die Oberfläche der Erweiterung ist auf Englisch.

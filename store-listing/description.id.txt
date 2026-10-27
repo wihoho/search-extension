@@ -1,0 +1,18 @@
+Cari di situs mana pun langsung dari address bar Chrome. Ketik os, tekan Spasi atau Tab, lalu kata kunci dan pencarian Anda, misalnya "youtube kucing". OmniSearch langsung membuka hasilnya.
+
+FITUR UTAMA
+• 10 pintasan siap pakai untuk situs populer, mulai dari video dan email hingga belanja dan referensi. Semuanya bisa dilihat dan diedit di sidebar.
+• Tambahkan pintasan sendiri untuk situs apa pun yang punya halaman pencarian: beri kata kunci dan URL pencarian dengan %s di posisi kata yang dicari.
+• Pintasan lanjutan untuk situs tanpa URL pencarian, seperti chat AI: OmniSearch membuka halamannya, mengetik teks Anda di kotak yang Anda pilih, lalu menekan tombolnya.
+• Sidebar untuk mengatur semuanya: klik ikon di toolbar atau tekan Ctrl+Shift+S (Cmd+Shift+S di Mac). Sidebar muncul dari kanan tanpa menutupi halaman.
+• Nyalakan, matikan, edit, atau hapus pintasan kapan saja.
+
+CARA PAKAI
+1. Ketik os di address bar lalu tekan Spasi atau Tab.
+2. Ketik kata kunci dan pencarian Anda, misalnya: youtube cara masak pasta
+3. Tekan Enter.
+
+PRIVASI
+Pintasan Anda disimpan di penyimpanan Chrome sendiri dan tersinkron dengan profil Chrome Anda. OmniSearch tanpa akun, tanpa iklan, tanpa pelacakan, dan tidak mengumpulkan atau mengirim isi halaman yang Anda kunjungi. Ekstensi ini hanya membuka halaman pencarian yang Anda minta, dan pintasan lanjutan hanya mengetik di situs yang Anda atur.
+
+Tampilan ekstensi ini dalam bahasa Inggris.

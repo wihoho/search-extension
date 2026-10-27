@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – 在地址栏直接搜索任意网站",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "在 Chrome 地址栏用简短关键词直接搜索任意网站。内置 10 个快捷方式，也可以添加你自己的网站。",
+    "description": "Extension description"
+  }
+}

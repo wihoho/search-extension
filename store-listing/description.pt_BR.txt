@@ -1,0 +1,18 @@
+Pesquise em qualquer site direto da barra de endereço do Chrome. Digite os, pressione Espaço ou Tab e depois uma palavra-chave e sua busca, como "youtube gatos". O OmniSearch abre os resultados na hora.
+
+PRINCIPAIS RECURSOS
+• 10 atalhos prontos para sites populares, de vídeo e e-mail a compras e consulta. Veja e edite todos na barra lateral.
+• Crie seus próprios atalhos para qualquer site que tenha página de busca: defina uma palavra-chave e uma URL de busca com %s onde entram suas palavras.
+• Atalhos avançados para sites sem URL de busca, como chats de IA: o OmniSearch abre a página, digita seu texto na caixa que você escolher e clica no botão por você.
+• Uma barra lateral para gerenciar tudo: clique no ícone da barra de ferramentas ou pressione Ctrl+Shift+S (Cmd+Shift+S no Mac). Ela desliza pela direita sem cobrir a página.
+• Ative, desative, edite ou apague atalhos quando quiser.
+
+COMO USAR
+1. Digite os na barra de endereço e pressione Espaço ou Tab.
+2. Digite uma palavra-chave e sua busca, por exemplo: youtube como fazer macarrão
+3. Pressione Enter.
+
+PRIVACIDADE
+Seus atalhos ficam salvos no armazenamento do próprio Chrome e sincronizam com seu perfil do Chrome. O OmniSearch não tem conta, anúncios nem rastreamento, e não coleta nem envia o conteúdo das páginas que você visita. Ele só abre a página de busca que você pede, e um atalho avançado só digita no site para o qual você o configurou.
+
+A interface da extensão está em inglês.

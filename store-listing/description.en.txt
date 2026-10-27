@@ -1,0 +1,18 @@
+Search any website straight from Chrome's address bar. Type os, press Space or Tab, then a keyword and your search, such as "youtube cats". OmniSearch opens the results right away.
+
+KEY FEATURES
+• 10 ready-made shortcuts for popular sites, from video and email to shopping and reference. See and edit them all in the sidebar.
+• Add your own shortcut for any site that has a search page: give it a keyword and a search URL with %s where your words go.
+• Advanced shortcuts for sites without a search URL, such as AI chat tools: OmniSearch opens the page, types your text into the box you choose and presses the button for you.
+• A sidebar to manage everything: click the toolbar icon or press Ctrl+Shift+S (Cmd+Shift+S on Mac). It slides in from the right without covering the page.
+• Turn shortcuts on or off, edit them or delete them at any time.
+
+HOW TO USE
+1. Type os in the address bar and press Space or Tab.
+2. Type a keyword and your search, for example: youtube how to cook pasta
+3. Press Enter.
+
+PRIVACY
+Your shortcuts are saved in Chrome's own storage and sync with your Chrome profile. OmniSearch has no account, no ads and no tracking, and it doesn't collect or send the content of the pages you visit. It only opens the search page you ask for, and an advanced shortcut only types into the site you set it up for.
+
+The extension's interface is in English.

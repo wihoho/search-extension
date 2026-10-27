@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OmniSearch</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header class="bar">
+    <img src="icons/icon48.png" alt="" class="logo">
+    <h1>OmniSearch</h1>
+    <button id="menu-btn" class="icon-btn" aria-label="More options" aria-haspopup="menu" aria-expanded="false">⋮</button>
+    <div id="menu" class="menu" role="menu" hidden>
+      <button role="menuitem" data-cmd="browse">Browse suggested shortcuts</button>
+      <button role="menuitem" data-cmd="export">Export shortcuts</button>
+      <button role="menuitem" data-cmd="import">Import shortcuts…</button>
+      <button role="menuitem" data-cmd="reset">Restore default shortcuts…</button>
+      <button role="menuitem" data-cmd="keys">Change keyboard shortcut</button>
+      <button role="menuitem" data-cmd="help">How to use OmniSearch</button>
+    </div>
+    <input type="file" id="import-file" accept="application/json,.json" hidden>
+  </header>
+
+  <main>
+    <section id="view-list">
+      <p class="tip">In the address bar, type <kbd>os</kbd>, press <kbd>Space</kbd>, then a keyword and your search: <code id="tip-example">os youtube cats</code></p>
+      <div class="toolbar">
+        <input id="filter" type="search" placeholder="Filter shortcuts" aria-label="Filter shortcuts" autocomplete="off">
+        <button id="add-btn" class="btn primary">+ Add</button>
+      </div>
+      <ul id="list" class="list"></ul>
+      <p id="empty" class="empty" hidden></p>
+      <button id="browse-btn" class="btn link">Browse suggested shortcuts</button>
+      <details class="hints">
+        <summary>Tips</summary>
+        <ul>
+          <li>Type only the keyword, like <code>os youtube</code>, to open the site.</li>
+          <li>Keywords can be shortened: <code>os you cats</code> works if no other keyword starts with “you”.</li>
+          <li>After typing your search, press <kbd>↓</kbd> to run the same search on another site.</li>
+          <li>Search several sites at once: <code>os youtube+amazon cats</code>.</li>
+          <li>Press <kbd>Alt</kbd>+<kbd>Enter</kbd> to open results in a new tab.</li>
+          <li>Right-click any site's search box and choose <b>Add a keyword for this search</b>.</li>
+          <li>No matching keyword? OmniSearch runs a normal web search instead.</li>
+        </ul>
+      </details>
+      <p class="keys">Open this panel: <kbd id="cmd-key">Ctrl+Shift+S</kbd> <button id="keys-btn" class="btn link small">Change</button></p>
+    </section>
+
+    <section id="view-form" hidden>
+      <div class="view-head">
+        <button class="icon-btn" data-back aria-label="Back">←</button>
+        <h2 id="form-title">Add shortcut</h2>
+      </div>
+      <p id="form-note" class="note" hidden></p>
+      <form id="form" novalidate>
+        <label for="f-url" id="f-url-label">Search URL</label>
+        <input id="f-url" type="url" placeholder="https://example.com/search?q=%s" autocomplete="off" spellcheck="false">
+        <small id="f-url-help">Search the site once, then paste the address of the results page. OmniSearch finds where your words go. You can also type the address with <code>%s</code> in place of the words.</small>
+        <div id="f-sample-row" class="inline" hidden>
+          <label for="f-sample">Which words did you search for?</label>
+          <div class="row">
+            <input id="f-sample" type="text" autocomplete="off">
+            <button type="button" id="f-sample-btn" class="btn">Find</button>
+          </div>
+        </div>
+
+        <label for="f-name">Name</label>
+        <input id="f-name" type="text" placeholder="Example" autocomplete="off" maxlength="80">
+
+        <label for="f-keyword">Keyword</label>
+        <input id="f-keyword" type="text" placeholder="ex" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32">
+        <small>You'll type <code id="f-example">os ex your search</code></small>
+
+        <details id="f-advanced">
+          <summary>Advanced: type into the page instead</summary>
+          <p class="muted">For sites without a search URL, such as some AI chat tools. OmniSearch opens the page, types your words into the box and presses the button. It needs your permission to access that one site.</p>
+          <label class="check"><input type="checkbox" id="f-adv"> Type into the page instead of using a search URL</label>
+          <label for="f-input">Text box (CSS selector)</label>
+          <input id="f-input" type="text" placeholder="textarea" autocomplete="off" spellcheck="false">
+          <label for="f-button">Send button (CSS selector, optional)</label>
+          <input id="f-button" type="text" placeholder="Leave empty to press Enter" autocomplete="off" spellcheck="false">
+          <small>Tip: right-click the box on the page, choose Inspect, then right-click the highlighted code and choose Copy › Copy selector.</small>
+        </details>
+
+        <p id="form-error" class="error" role="alert"></p>
+        <div class="actions">
+          <button type="button" id="try-btn" class="btn">Try it</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn" data-back>Cancel</button>
+          <button type="submit" class="btn primary">Save</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="view-catalog" hidden>
+      <div class="view-head">
+        <button class="icon-btn" data-back aria-label="Back">←</button>
+        <h2>Suggested shortcuts</h2>
+      </div>
+      <div id="catalog"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden>
+    <span id="toast-text"></span>
+    <button id="toast-undo" class="btn link" hidden>Undo</button>
+  </div>
+
+  <dialog id="confirm">
+    <p id="confirm-text"></p>
+    <div class="actions">
+      <span class="spacer"></span>
+      <button class="btn" value="cancel" id="confirm-cancel">Cancel</button>
+      <button class="btn danger" value="ok" id="confirm-ok">OK</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

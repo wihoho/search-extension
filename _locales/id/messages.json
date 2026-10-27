@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – Cari di Situs Mana Pun dari Address Bar",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Cari di situs mana pun dari address bar Chrome dengan kata kunci singkat. Ada 10 pintasan bawaan, dan Anda bisa menambah sendiri.",
+    "description": "Extension description"
+  }
+}

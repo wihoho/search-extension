@@ -1,0 +1,18 @@
+Chrome adres çubuğundan istediğiniz sitede doğrudan arama yapın. os yazın, Boşluk veya Tab'a basın, ardından bir anahtar kelime ve aramanızı yazın; örneğin "youtube kediler". OmniSearch sonuçları hemen açar.
+
+ÖNE ÇIKAN ÖZELLİKLER
+• Popüler siteler için kullanıma hazır 10 kısayol: video, e-posta, alışveriş, ansiklopedi ve daha fazlası. Hepsini kenar çubuğunda görebilir ve düzenleyebilirsiniz.
+• Arama sayfası olan her site için kendi kısayolunuzu ekleyin: bir anahtar kelime ve aranan kelimelerin yerine %s yazılmış bir arama URL'si girin.
+• Arama URL'si olmayan siteler, örneğin yapay zekâ sohbetleri için gelişmiş kısayollar: OmniSearch sayfayı açar, metninizi seçtiğiniz kutuya yazar ve düğmeye sizin yerinize basar.
+• Her şeyi yönetmek için kenar çubuğu: araç çubuğu simgesine tıklayın veya Ctrl+Shift+S'ye basın (Mac'te Cmd+Shift+S). Sayfayı kapatmadan sağdan kayarak açılır.
+• Kısayolları istediğiniz zaman açın, kapatın, düzenleyin veya silin.
+
+NASIL KULLANILIR
+1. Adres çubuğuna os yazıp Boşluk veya Tab'a basın.
+2. Bir anahtar kelime ve aramanızı yazın, örneğin: youtube makarna nasıl yapılır
+3. Enter'a basın.
+
+GİZLİLİK
+Kısayollarınız Chrome'un kendi depolamasında saklanır ve Chrome profilinizle senkronize edilir. OmniSearch'te hesap, reklam ve izleme yoktur; ziyaret ettiğiniz sayfaların içeriğini toplamaz veya göndermez. Yalnızca istediğiniz arama sayfasını açar ve gelişmiş bir kısayol yalnızca onu kurduğunuz sitede yazı yazar.
+
+Uzantının arayüzü İngilizcedir.

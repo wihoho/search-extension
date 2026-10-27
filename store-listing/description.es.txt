@@ -1,0 +1,18 @@
+Busca en cualquier web directamente desde la barra de direcciones de Chrome. Escribe os, pulsa Espacio o Tab y luego una palabra clave y tu búsqueda, como "youtube gatos". OmniSearch abre los resultados al instante.
+
+FUNCIONES PRINCIPALES
+• 10 atajos listos para webs populares, de vídeo y correo a compras y consulta. Puedes verlos y editarlos todos en la barra lateral.
+• Añade tus propios atajos para cualquier web con página de búsqueda: ponle una palabra clave y una URL de búsqueda con %s donde van tus palabras.
+• Atajos avanzados para webs sin URL de búsqueda, como los chats de IA: OmniSearch abre la página, escribe tu texto en el cuadro que elijas y pulsa el botón por ti.
+• Una barra lateral para gestionarlo todo: haz clic en el icono de la barra de herramientas o pulsa Ctrl+Shift+S (Cmd+Shift+S en Mac). Se desliza desde la derecha sin tapar la página.
+• Activa o desactiva atajos, edítalos o bórralos cuando quieras.
+
+CÓMO SE USA
+1. Escribe os en la barra de direcciones y pulsa Espacio o Tab.
+2. Escribe una palabra clave y tu búsqueda, por ejemplo: youtube cómo cocinar pasta
+3. Pulsa Intro.
+
+PRIVACIDAD
+Tus atajos se guardan en el almacenamiento de Chrome y se sincronizan con tu perfil de Chrome. OmniSearch no tiene cuenta, anuncios ni rastreo, y no recoge ni envía el contenido de las páginas que visitas. Solo abre la página de búsqueda que pides, y un atajo avanzado solo escribe en la web para la que lo configuraste.
+
+La interfaz de la extensión está en inglés.

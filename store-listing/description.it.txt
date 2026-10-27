@@ -1,0 +1,18 @@
+Cerca in qualsiasi sito direttamente dalla barra degli indirizzi di Chrome. Digita os, premi Spazio o Tab, poi una parola chiave e la tua ricerca, come "youtube gatti". OmniSearch apre subito i risultati.
+
+FUNZIONI PRINCIPALI
+• 10 scorciatoie pronte per siti popolari, dai video e la posta allo shopping e alle enciclopedie. Puoi vederle e modificarle tutte nella barra laterale.
+• Aggiungi scorciatoie tue per qualsiasi sito con una pagina di ricerca: una parola chiave e un URL di ricerca con %s al posto delle parole cercate.
+• Scorciatoie avanzate per i siti senza URL di ricerca, come le chat di IA: OmniSearch apre la pagina, scrive il tuo testo nella casella che scegli e preme il pulsante per te.
+• Una barra laterale per gestire tutto: clicca sull'icona nella barra degli strumenti o premi Ctrl+Maiusc+S (Cmd+Maiusc+S su Mac). Scorre da destra senza coprire la pagina.
+• Attiva, disattiva, modifica o elimina le scorciatoie quando vuoi.
+
+COME SI USA
+1. Digita os nella barra degli indirizzi e premi Spazio o Tab.
+2. Scrivi una parola chiave e la ricerca, per esempio: youtube come cucinare la pasta
+3. Premi Invio.
+
+PRIVACY
+Le scorciatoie sono salvate nello spazio di archiviazione di Chrome e si sincronizzano con il tuo profilo Chrome. OmniSearch non ha account, pubblicità né tracciamento, e non raccoglie né invia il contenuto delle pagine che visiti. Apre solo la pagina di ricerca che chiedi, e una scorciatoia avanzata scrive solo nel sito per cui l'hai configurata.
+
+L'interfaccia dell'estensione è in inglese.

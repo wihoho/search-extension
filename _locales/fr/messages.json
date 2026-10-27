@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – Cherchez sur n'importe quel site depuis la barre d'adresse",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Cherchez sur tout site depuis la barre d'adresse de Chrome avec des mots-clés courts. 10 raccourcis inclus, ajoutez les vôtres.",
+    "description": "Extension description"
+  }
+}

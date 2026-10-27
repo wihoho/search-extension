@@ -1,0 +1,18 @@
+Cherchez sur n'importe quel site directement depuis la barre d'adresse de Chrome. Tapez os, appuyez sur Espace ou Tab, puis un mot-clé et votre recherche, comme « youtube chats ». OmniSearch ouvre les résultats aussitôt.
+
+FONCTIONNALITÉS
+• 10 raccourcis prêts à l'emploi pour des sites populaires : vidéo, e-mail, shopping, encyclopédie… Vous pouvez tous les voir et les modifier dans le panneau latéral.
+• Ajoutez vos propres raccourcis pour tout site doté d'une page de recherche : un mot-clé et une URL de recherche avec %s à la place de vos mots.
+• Raccourcis avancés pour les sites sans URL de recherche, comme les chats d'IA : OmniSearch ouvre la page, saisit votre texte dans la zone choisie et clique sur le bouton pour vous.
+• Un panneau latéral pour tout gérer : cliquez sur l'icône de la barre d'outils ou appuyez sur Ctrl+Maj+S (Cmd+Maj+S sur Mac). Il glisse depuis la droite sans masquer la page.
+• Activez, désactivez, modifiez ou supprimez vos raccourcis à tout moment.
+
+MODE D'EMPLOI
+1. Tapez os dans la barre d'adresse et appuyez sur Espace ou Tab.
+2. Tapez un mot-clé et votre recherche, par exemple : youtube recette pâtes
+3. Appuyez sur Entrée.
+
+CONFIDENTIALITÉ
+Vos raccourcis sont enregistrés dans le stockage de Chrome et synchronisés avec votre profil Chrome. OmniSearch n'a ni compte, ni publicité, ni pistage, et ne collecte ni n'envoie le contenu des pages que vous visitez. Il ouvre seulement la page de recherche demandée, et un raccourci avancé ne saisit du texte que sur le site pour lequel vous l'avez configuré.
+
+L'interface de l'extension est en anglais.

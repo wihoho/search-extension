@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – поиск по любому сайту из адресной строки",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Ищите на любом сайте прямо из адресной строки Chrome по коротким ключевым словам. 10 готовых сокращений и возможность добавить свои.",
+    "description": "Extension description"
+  }
+}

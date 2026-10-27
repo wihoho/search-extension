@@ -1,17 +1,45 @@
 // OmniSearch Welcome Page Script
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupEventListeners();
-    markFirstTimeComplete();
-});
+import { loadShortcuts, hostLabel, siteOrigin } from './lib/shortcuts.js';
+
+// Module scripts run after the document is parsed.
+let windowId = null;
+chrome.windows.getCurrent().then((win) => { windowId = win.id; });
+setupEventListeners();
+renderShortcuts();
+addInteractiveAnimations();
+
+async function renderShortcuts() {
+    const grid = document.getElementById('shortcuts-grid');
+    const shortcuts = await loadShortcuts();
+    for (const [keyword, shortcut] of Object.entries(shortcuts)) {
+        if (!shortcut.enabled) continue;
+        const card = document.createElement('div');
+        card.className = 'shortcut-card';
+        const img = document.createElement('img');
+        img.alt = '';
+        img.src = `${siteOrigin(shortcut.url)}/favicon.ico`;
+        img.addEventListener('error', () => { img.src = 'icons/icon16.png'; }, { once: true });
+        const info = document.createElement('div');
+        info.className = 'shortcut-info';
+        const strong = document.createElement('strong');
+        strong.textContent = keyword;
+        const span = document.createElement('span');
+        span.textContent = `${shortcut.name} · ${hostLabel(shortcut.url)}`;
+        info.append(strong, span);
+        card.append(img, info);
+        grid.append(card);
+    }
+}
 
 function setupEventListeners() {
     // Open Settings button
     const openSettingsBtn = document.getElementById('open-settings');
     if (openSettingsBtn) {
         openSettingsBtn.addEventListener('click', () => {
-            // Open the extension popup (this will open the settings)
-            chrome.runtime.openOptionsPage();
+            // Call open() straight from the click (no await first), or Chrome refuses it.
+            const opening = windowId === null ? Promise.reject() : chrome.sidePanel.open({ windowId });
+            opening.catch(() => chrome.runtime.openOptionsPage());
         });
     }
 
@@ -168,13 +196,6 @@ function showCopyFeedback(element) {
     }, 1500);
 }
 
-function markFirstTimeComplete() {
-    // Mark that the user has seen the welcome page
-    if (chrome.storage) {
-        chrome.storage.sync.set({ firstTime: false });
-    }
-}
-
 // Add some interactive animations
 function addInteractiveAnimations() {
     // Animate step numbers on scroll
@@ -201,11 +222,6 @@ function addInteractiveAnimations() {
     `;
     document.head.appendChild(style);
 }
-
-// Initialize animations when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    addInteractiveAnimations();
-});
 
 // Add keyboard shortcut hint
 document.addEventListener('keydown', (e) => {

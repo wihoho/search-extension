@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – Search Any Site from the Address Bar",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Search any website from Chrome's address bar with short keywords. 10 starter shortcuts included, and you can add your own.",
+    "description": "Extension description"
+  }
+}

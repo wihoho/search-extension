@@ -1,395 +1,235 @@
-// OmniSearch Background Script
-// Handles omnibox functionality and search redirections
+// OmniSearch service worker: address bar ("os" keyword), context menus,
+// keyboard shortcut and advanced (fill-in-the-page) shortcuts.
 
-// Debug mode - set to true for production
-const DEBUG = true;
+import {
+  loadShortcuts, loadUsage, recordUse, isShortcutChange, resolveInput, matchKeywords,
+  rankKeywords, targetUrl, siteOrigin, hostLabel, originPattern, escapeXml, cleanShortcut,
+} from './lib/shortcuts.js';
+import { fillAndSubmit, detectSearchUrl } from './lib/page-scripts.js';
 
-function debugLog(...args) {
-  if (DEBUG) {
-    console.log('OmniSearch:', ...args);
-  }
+let shortcuts = {};
+let usage = {};
+let ready = refresh();
+
+async function refresh() {
+  [shortcuts, usage] = await Promise.all([loadShortcuts(), loadUsage()]);
 }
 
-debugLog('Background script starting...');
-
-// Default search shortcuts configuration
-const DEFAULT_SHORTCUTS = {
-  'ai': {
-    name: 'AI Studio',
-    keyword: 'ai',
-    type: 'advanced',
-    url: 'https://aistudio.google.com/prompts/new_chat',
-    inputSelector: 'textarea',
-    buttonSelector: 'button[aria-label*="Run"]:not([disabled])',
-    enabled: true,
-    icon: 'https://www.gstatic.com/a/images/brand/project-wordmark/bard-64.png'
-  },
-  'drive': {
-    name: 'Google Drive',
-    url: 'https://drive.google.com/drive/search?q=%s',
-    enabled: true,
-    icon: 'https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png'
-  },
-  'gmail': {
-    name: 'Gmail',
-    url: 'https://mail.google.com/mail/u/0/#search/%s',
-    enabled: true,
-    icon: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico'
-  },
-  'youtube': {
-    name: 'YouTube',
-    url: 'https://www.youtube.com/results?search_query=%s',
-    enabled: true,
-    icon: 'https://www.youtube.com/favicon.ico'
-  },
-  'amazon': {
-    name: 'Amazon',
-    url: 'https://www.amazon.com/s?k=%s',
-    enabled: true,
-    icon: 'https://www.amazon.com/favicon.ico'
-  },
-  'wikipedia': {
-    name: 'Wikipedia',
-    url: 'https://en.wikipedia.org/wiki/Special:Search?search=%s',
-    enabled: true,
-    icon: 'https://en.wikipedia.org/favicon.ico'
-  },
-  'imdb': {
-    name: 'IMDb',
-    url: 'https://www.imdb.com/find?q=%s',
-    enabled: true,
-    icon: 'https://www.imdb.com/favicon.ico'
-  },
-  'spotify': {
-    name: 'Spotify',
-    url: 'https://open.spotify.com/search/%s',
-    enabled: true,
-    icon: 'https://open.spotify.com/favicon.ico'
-  },
-  'github': {
-    name: 'GitHub',
-    url: 'https://github.com/search?q=%s',
-    enabled: true,
-    icon: 'https://github.com/favicon.ico'
-  },
-  'twitter': {
-    name: 'Twitter',
-    url: 'https://twitter.com/search?q=%s',
-    enabled: true,
-    icon: 'https://twitter.com/favicon.ico'
-  }
-};
-
-let currentShortcuts = {};
-let currentKeyword = '';
-let shortcutsLoaded = false;
-
-// Initialize extension
-chrome.runtime.onInstalled.addListener(async (details) => {
-  debugLog('Extension installed/updated', details);
-
-  try {
-    if (details.reason === 'install') {
-      debugLog('First time installation');
-      // First time installation - set up default shortcuts
-      await chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS });
-      await chrome.storage.sync.set({ firstTime: true });
-      debugLog('Default shortcuts saved');
-
-      // Open welcome page
-      chrome.tabs.create({
-        url: chrome.runtime.getURL('welcome.html')
-      });
-    } else if (details.reason === 'update') {
-      debugLog('Extension updated');
-      // Handle extension updates
-      const result = await chrome.storage.sync.get(['shortcuts']);
-      if (!result.shortcuts) {
-        await chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS });
-        debugLog('Default shortcuts restored after update');
-      }
-    }
-
-    // Load shortcuts
-    await loadShortcuts();
-    debugLog('Initialization complete');
-  } catch (error) {
-    console.error('OmniSearch: Error during initialization:', error);
-  }
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && isShortcutChange(changes)) ready = refresh();
+  if (area === 'local' && changes.usage) usage = changes.usage.newValue || {};
 });
 
-// Load shortcuts from storage
-async function loadShortcuts() {
-  try {
-    debugLog('Loading shortcuts from storage...');
-    const result = await chrome.storage.sync.get(['shortcuts']);
-    currentShortcuts = result.shortcuts || DEFAULT_SHORTCUTS;
-    shortcutsLoaded = true;
-    debugLog('Loaded shortcuts:', Object.keys(currentShortcuts));
-  } catch (error) {
-    console.error('OmniSearch: Error loading shortcuts:', error);
-    currentShortcuts = DEFAULT_SHORTCUTS;
-    shortcutsLoaded = true;
-  }
-}
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
 
-// Omnibox input started
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+  ready = refresh(); // migrates 2.0 storage, or installs the defaults
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: 'add-from-field', title: 'Add a keyword for this search…', contexts: ['editable'],
+      documentUrlPatterns: ['https://*/*', 'http://*/*'],
+    });
+    chrome.contextMenus.create({ id: 'add-from-page', title: 'Add this site to OmniSearch…', contexts: ['action'] });
+  });
+  if (reason === 'install') chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') });
+});
+
+// ---------------------------------------------------------------------------
+// Address bar
+
+const keywordLine = (k) => `<match>${escapeXml(k)}</match> <dim>${escapeXml(shortcuts[k].name)}</dim>`;
+
 chrome.omnibox.onInputStarted.addListener(() => {
-  debugLog('Omnibox input started');
-  currentKeyword = '';
+  ready = refresh();
 });
 
-// Omnibox input changed - provide suggestions
-chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-  debugLog('Input changed:', text);
+chrome.omnibox.onInputChanged.addListener(onInputChanged);
+chrome.omnibox.onInputEntered.addListener(onInputEntered);
 
-  try {
-    const suggestions = [];
+// Also reachable as `omnisearch.onInputChanged('yt cats', console.log)` from the
+// service worker console, which is how the end-to-end test drives the address bar.
+globalThis.omnisearch = { onInputChanged, onInputEntered };
 
-    // Check if user is typing a keyword
-    const parts = text.split(' ');
-    const keyword = parts[0].toLowerCase();
+async function onInputChanged(text, suggest) {
+  await ready;
+  const input = resolveInput(shortcuts, text, usage);
+  const { query, keywords } = input;
+  const suggestions = [];
+  let description;
 
-    debugLog('Parsed keyword:', keyword, 'parts:', parts.length);
+  if (!input.token) {
+    const top = rankKeywords(shortcuts, usage);
+    description = top.length
+      ? `Type a keyword, then your search. For example: <match>${escapeXml(top[0])}</match> <dim>your search</dim>`
+      : 'No shortcuts yet. Click the OmniSearch icon to add some.';
+    for (const k of top.slice(0, 5)) suggestions.push({ content: `${k} `, description: keywordLine(k) });
+  } else if (keywords) {
+    const names = escapeXml(keywords.map((k) => shortcuts[k].name).join(', '));
+    description = query
+      ? `Search <match>${names}</match> for <match>${escapeXml(query)}</match>`
+      : `Open <match>${names}</match> <url>${escapeXml(hostLabel(shortcuts[keywords[0]].url))}</url>`;
 
-    if (parts.length === 1) {
-      // User is still typing keyword - show available shortcuts
-      Object.keys(currentShortcuts).forEach(key => {
-        if (key.startsWith(keyword) && currentShortcuts[key].enabled) {
-          suggestions.push({
-            content: key,
-            description: `Search ${currentShortcuts[key].name} - Type your query after "${key} "`
-          });
-        }
-      });
-    } else if (currentShortcuts[keyword] && currentShortcuts[keyword].enabled) {
-      // Valid keyword found - show search suggestion
-      currentKeyword = keyword;
-      const query = parts.slice(1).join(' ');
-      debugLog('Valid keyword found:', keyword, 'query:', query);
-      if (query.trim()) {
+    if (!input.hasSpace && input.parts.length === 1) {
+      // Still typing the keyword: offer the other matches.
+      for (const k of matchKeywords(shortcuts, input.parts[0], usage).filter((k) => k !== keywords[0]).slice(0, 5)) {
+        suggestions.push({ content: `${k} `, description: keywordLine(k) });
+      }
+    } else if (query) {
+      // Same words on another site: arrow down and press Enter.
+      for (const k of rankKeywords(shortcuts, usage).filter((k) => !keywords.includes(k)).slice(0, 5)) {
         suggestions.push({
-          content: `${keyword} ${query}`,
-          description: `Search ${currentShortcuts[keyword].name} for: ${query}`
+          content: `${k} ${query}`,
+          description: `Search ${escapeXml(shortcuts[k].name)} for <match>${escapeXml(query)}</match> <dim>${escapeXml(k)}</dim>`,
         });
       }
     }
-
-    debugLog('Providing suggestions:', suggestions.length);
-    suggest(suggestions);
-  } catch (error) {
-    console.error('OmniSearch: Error in onInputChanged:', error);
-    suggest([]);
-  }
-});
-
-// Omnibox input entered - perform search
-chrome.omnibox.onInputEntered.addListener(async (text) => {
-  debugLog('Input entered:', text);
-
-  try {
-    const [keyword, ...queryParts] = text.split(' ');
-    const query = queryParts.join(' ');
-    const shortcut = currentShortcuts[keyword.toLowerCase()];
-
-    debugLog('Parsed - keyword:', keyword, 'query:', query);
-
-    if (!shortcut || !shortcut.enabled || !query) {
-      debugLog('Search not executed - invalid keyword, disabled, or empty query');
-      return;
+  } else {
+    description = `Search the web for <match>${escapeXml(text.trim())}</match> <dim>(no shortcut "${escapeXml(input.parts.join('+'))}")</dim>`;
+    for (const k of matchKeywords(shortcuts, input.parts[0] || '', usage).slice(0, 5)) {
+      suggestions.push({ content: query ? `${k} ${query}` : `${k} `, description: keywordLine(k) });
     }
+  }
 
-    if (shortcut.type === 'advanced') {
-      // --- THIS IS THE NEW ADVANCED WORKFLOW ---
-      debugLog(`Executing advanced shortcut: '${keyword}'`);
-      
-      const tab = await chrome.tabs.create({ url: shortcut.url, active: true });
-      debugLog(`Created tab ${tab.id} with URL: ${shortcut.url}`);
+  chrome.omnibox.setDefaultSuggestion({ description });
+  suggest(suggestions);
+  return { description, suggestions };
+}
 
-      // The content script is now injected via manifest.json, so we just need to
-      // wait for the tab to be ready and send the message.
-      const listener = (tabId, changeInfo) => {
-        debugLog(`Tab update detected: tabId=${tabId}, status=${changeInfo.status}`);
-        if (tabId === tab.id && changeInfo.status === 'complete') {
-          debugLog(`Tab ${tabId} is complete. Sending message...`);
-          chrome.tabs.sendMessage(tab.id, {
-            type: 'OMNISEARCH_AUTOMATE',
-            query: query,
-            inputSelector: shortcut.inputSelector,
-            buttonSelector: shortcut.buttonSelector
-          }, (response) => {
-            if (chrome.runtime.lastError) {
-              console.error('OmniSearch: Error sending message:', chrome.runtime.lastError.message);
-            } else {
-              debugLog('Automation script responded:', response);
-            }
-          });
-          
-          // Clean up the listener
-          debugLog(`Removing listener for tab ${tabId}`);
-          chrome.tabs.onUpdated.removeListener(listener);
-        }
-      };
-      chrome.tabs.onUpdated.addListener(listener);
-
-    } else {
-      // --- THIS IS THE EXISTING SIMPLE WORKFLOW ---
-      debugLog('Executing simple shortcut:', keyword);
-      const searchUrl = shortcut.url.replace('%s', encodeURIComponent(query));
-      debugLog('Generated search URL:', searchUrl);
-      chrome.tabs.create({ url: searchUrl });
+async function onInputEntered(text, disposition) {
+  await ready;
+  const { keywords, query } = resolveInput(shortcuts, text, usage);
+  if (!keywords) {
+    const words = text.trim();
+    if (words) {
+      chrome.search.query({ text: words, disposition: disposition === 'currentTab' ? 'CURRENT_TAB' : 'NEW_TAB' });
     }
-
-  } catch (error) {
-    console.error('OmniSearch: Error in onInputEntered:', error);
+    return;
   }
-});
-
-// Listen for storage changes to update shortcuts
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  debugLog('Storage changed:', changes, 'namespace:', namespace);
-  if (namespace === 'sync' && changes.shortcuts) {
-    currentShortcuts = changes.shortcuts.newValue;
-    debugLog('Shortcuts updated from storage:', Object.keys(currentShortcuts));
+  recordUse(keywords);
+  for (const [i, keyword] of keywords.entries()) {
+    // The first site opens where the user asked; the rest open in background tabs.
+    run(shortcuts[keyword], query, i === 0 ? disposition : 'newBackgroundTab');
   }
-});
+}
 
-// Message handling for popup communication
-chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
-  debugLog('Message received:', request);
+// ---------------------------------------------------------------------------
+// Opening shortcuts
 
-  try {
-    if (request.action === 'getShortcuts') {
-      // Ensure shortcuts are loaded before responding
-      if (!shortcutsLoaded) {
-        debugLog('Shortcuts not loaded yet, loading now...');
-        loadShortcuts().then(() => {
-          debugLog('Sending shortcuts to popup:', Object.keys(currentShortcuts));
-          sendResponse({ shortcuts: currentShortcuts });
-        }).catch(error => {
-          console.error('OmniSearch: Error loading shortcuts for popup:', error);
-          sendResponse({ shortcuts: DEFAULT_SHORTCUTS });
-        });
-        return true; // Will respond asynchronously
-      } else {
-        debugLog('Sending shortcuts to popup:', Object.keys(currentShortcuts));
-        sendResponse({ shortcuts: currentShortcuts });
-      }
-    } else if (request.action === 'updateShortcuts') {
-      debugLog('Updating shortcuts from popup');
-      // Ensure we save to storage first, then update current shortcuts
-      chrome.storage.sync.set({ shortcuts: request.shortcuts }).then(() => {
-        currentShortcuts = request.shortcuts;
-        debugLog('Shortcuts saved and updated:', Object.keys(currentShortcuts));
-        sendResponse({ success: true });
-      }).catch(error => {
-        console.error('OmniSearch: Error saving shortcuts:', error);
-        sendResponse({ success: false, error: error.message });
-      });
-      return true; // Will respond asynchronously
-    } else if (request.action === 'resetToDefaults') {
-      debugLog('Resetting to default shortcuts');
-      chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS }).then(() => {
-        currentShortcuts = DEFAULT_SHORTCUTS;
-        shortcutsLoaded = true;
-        sendResponse({ success: true });
-      }).catch(error => {
-        console.error('OmniSearch: Error resetting shortcuts:', error);
-        sendResponse({ success: false, error: error.message });
-      });
-      return true; // Will respond asynchronously
-    }
-  } catch (error) {
-    console.error('OmniSearch: Error handling message:', error);
-    sendResponse({ error: error.message });
-  }
-
-  return true; // Keep message channel open for async response
-});
-
-// Handle browser startup
-chrome.runtime.onStartup.addListener(async () => {
-  debugLog('Browser startup detected');
-  await loadShortcuts();
-});
-
-// Handle action click (extension icon click)
-chrome.action.onClicked.addListener(async (tab) => {
-  debugLog('Extension icon clicked, toggling sidebar on tab:', tab.id);
-  await toggleSidebar(tab.id);
-});
-
-// Handle keyboard shortcut
-chrome.commands.onCommand.addListener(async (command) => {
-  debugLog('Command received:', command);
-  
-  if (command === 'toggle-sidebar') {
+async function openTab(url, disposition) {
+  if (disposition === 'currentTab') {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tab) {
-      await toggleSidebar(tab.id);
-    }
+    if (tab) return chrome.tabs.update(tab.id, { url });
   }
+  return chrome.tabs.create({ url, active: disposition !== 'newBackgroundTab' });
+}
+
+async function run(shortcut, query, disposition) {
+  if (shortcut.type !== 'advanced' || !query) {
+    await openTab(targetUrl(shortcut, query), disposition);
+    return { ok: true };
+  }
+  const pattern = originPattern(shortcut.url);
+  const allowed = pattern && await chrome.permissions.contains({ origins: [pattern] });
+  const tab = await openTab(shortcut.url, disposition);
+  const origin = siteOrigin(shortcut.url);
+  if (!allowed) {
+    return flagTab(tab.id, origin, `OmniSearch needs access to ${hostLabel(shortcut.url)} to type your search. Open OmniSearch and click "Allow" on ${shortcut.name}.`);
+  }
+  if (!await tabLoaded(tab.id, origin)) {
+    return flagTab(tab.id, origin, `${shortcut.name} didn't finish loading.`);
+  }
+  try {
+    const [{ result }] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: fillAndSubmit,
+      args: [query, shortcut.inputSelector, shortcut.buttonSelector || ''],
+    });
+    return result.ok ? result : flagTab(tab.id, origin, result.error);
+  } catch (error) {
+    return flagTab(tab.id, origin, `Couldn't type into ${shortcut.name}: ${error.message}`);
+  }
+}
+
+function tabLoaded(tabId, origin, timeout = 30000) {
+  return new Promise((resolve) => {
+    const isDone = (tab) => tab.status === 'complete' && (tab.url || '').startsWith(origin);
+    const finish = (ok) => {
+      clearTimeout(timer);
+      chrome.tabs.onUpdated.removeListener(listener);
+      resolve(ok);
+    };
+    const listener = (id, _info, tab) => {
+      if (id === tabId && isDone(tab)) finish(true);
+    };
+    const timer = setTimeout(() => finish(false), timeout);
+    chrome.tabs.onUpdated.addListener(listener);
+    chrome.tabs.get(tabId).then((tab) => isDone(tab) && finish(true), () => finish(false));
+  });
+}
+
+// Problems with advanced shortcuts show as a red "!" on the toolbar icon for
+// that tab, with the reason in the tooltip, until the tab leaves the site.
+const flagged = new Map(); // tabId -> origin
+
+function flagTab(tabId, origin, message) {
+  flagged.set(tabId, origin);
+  chrome.action.setBadgeBackgroundColor({ tabId, color: '#d93025' });
+  chrome.action.setBadgeText({ tabId, text: '!' });
+  chrome.action.setTitle({ tabId, title: message });
+  return { ok: false, error: message };
+}
+
+chrome.tabs.onUpdated.addListener((tabId, info) => {
+  if (!info.url || !flagged.has(tabId) || info.url.startsWith(flagged.get(tabId))) return;
+  flagged.delete(tabId);
+  chrome.action.setBadgeText({ tabId, text: '' }).catch(() => {});
+  chrome.action.setTitle({ tabId, title: 'OmniSearch' }).catch(() => {});
+});
+chrome.tabs.onRemoved.addListener((tabId) => flagged.delete(tabId));
+
+// ---------------------------------------------------------------------------
+// Side panel: the keyboard shortcut toggles it, context menus prefill its add form
+
+const openPanels = new Map(); // windowId -> port
+
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name !== 'sidepanel') return;
+  port.onMessage.addListener(({ windowId }) => {
+    openPanels.set(windowId, port);
+    port.onDisconnect.addListener(() => openPanels.delete(windowId));
+  });
 });
 
-// Helper function to check if URL is restricted
-function isRestrictedUrl(url) {
-  if (!url || typeof url !== 'string') return true;
-  
-  const restrictedPrefixes = [
-    'chrome://',
-    'chrome-extension://',
-    'moz-extension://',
-    'safari-extension://',
-    'edge-extension://',
-    'chrome-devtools://',
-    'devtools://',
-    'about:'
-  ];
-  
-  return restrictedPrefixes.some(prefix => url.startsWith(prefix));
-}
+chrome.commands.onCommand.addListener((command, tab) => {
+  if (command !== 'toggle-sidebar' || !tab) return;
+  const port = openPanels.get(tab.windowId);
+  if (port) port.postMessage({ action: 'close' });
+  else chrome.sidePanel.open({ windowId: tab.windowId });
+});
 
-// Helper function to toggle sidebar
-async function toggleSidebar(tabId) {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (!tab) return;
+  // Open the panel first, while Chrome still counts this as a user action.
+  chrome.sidePanel.open({ windowId: tab.windowId }).catch(() => {});
+  let found;
   try {
-    // Get tab information to check URL
-    const tab = await chrome.tabs.get(tabId);
-    
-    // Check if the URL is restricted
-    if (isRestrictedUrl(tab.url)) {
-      debugLog(`Cannot toggle sidebar on restricted URL: ${tab.url}`);
-      return;
-    }
-    
-    // Send message to content script to toggle sidebar
-    await chrome.tabs.sendMessage(tabId, { action: 'toggleSidebar' });
-  } catch (error) {
-    debugLog('Error toggling sidebar:', error);
-    // If content script isn't ready, inject it first
-    try {
-      // Double-check URL before injection attempt
-      const tab = await chrome.tabs.get(tabId);
-      if (isRestrictedUrl(tab.url)) {
-        debugLog(`Cannot inject script on restricted URL: ${tab.url}`);
-        return;
-      }
-      
-      await chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        files: ['sidebar.js']
-      });
-      // Then try to send the message again
-      setTimeout(() => {
-        chrome.tabs.sendMessage(tabId, { action: 'toggleSidebar' });
-      }, 100);
-    } catch (injectError) {
-      console.error('OmniSearch: Failed to inject or toggle sidebar:', injectError);
-    }
+    const [{ result }] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id, frameIds: [info.frameId || 0] },
+      func: detectSearchUrl,
+      args: [info.menuItemId === 'add-from-field'],
+    });
+    found = result;
+  } catch {
+    found = { name: hostLabel(tab.url || ''), url: null, error: "Chrome doesn't let extensions read this page." };
   }
-}
+  await chrome.storage.session.set({ pendingAdd: { ...found, at: Date.now() } });
+});
 
-// Ensure shortcuts are loaded when service worker becomes active
-(async () => {
-  debugLog('Service worker activated, loading shortcuts...');
-  await loadShortcuts();
-})();
+// The side panel's "Try it" button runs the form's (possibly unsaved) shortcut.
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.action !== 'run' || sender.id !== chrome.runtime.id) return false;
+  const shortcut = cleanShortcut(message.shortcut);
+  if (!shortcut) return false;
+  run(shortcut, String(message.query || ''), 'newForegroundTab').then(sendResponse);
+  return true;
+});

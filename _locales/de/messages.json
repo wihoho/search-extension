@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – Jede Website direkt aus der Adressleiste durchsuchen",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Durchsuche jede Website direkt in Chromes Adressleiste mit kurzen Kürzeln. 10 Start-Kürzel inklusive, eigene jederzeit hinzufügbar.",
+    "description": "Extension description"
+  }
+}

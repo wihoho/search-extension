@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – Cerca in qualsiasi sito dalla barra degli indirizzi",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Cerca in qualsiasi sito dalla barra degli indirizzi di Chrome con parole chiave. 10 scorciatoie incluse e puoi aggiungerne di tue.",
+    "description": "Extension description"
+  }
+}

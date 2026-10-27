@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – Adres çubuğundan her sitede arama yapın",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Chrome adres çubuğundan kısa anahtar kelimelerle her sitede arama yapın. 10 hazır kısayol var, kendinizinkileri de ekleyebilirsiniz.",
+    "description": "Extension description"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "OmniSearch – Pesquise qualquer site pela barra de endereço",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Pesquise em qualquer site pela barra de endereço do Chrome com palavras-chave curtas. Vem com 10 atalhos e você pode criar outros.",
+    "description": "Extension description"
+  }
+}

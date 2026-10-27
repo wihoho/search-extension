@@ -73,53 +73,10 @@
 
             <section class="shortcuts-preview">
                 <h2>📚 Available Shortcuts</h2>
-                <p>OmniSearch comes with these popular websites pre-configured:</p>
-                <div class="shortcuts-grid">
-                    <div class="shortcut-card">
-                        <img src="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" alt="Google Drive">
-                        <div class="shortcut-info">
-                            <strong>drive</strong>
-                            <span>Google Drive</span>
-                        </div>
-                    </div>
-                    <div class="shortcut-card">
-                        <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="Gmail">
-                        <div class="shortcut-info">
-                            <strong>gmail</strong>
-                            <span>Gmail</span>
-                        </div>
-                    </div>
-                    <div class="shortcut-card">
-                        <img src="https://www.youtube.com/favicon.ico" alt="YouTube">
-                        <div class="shortcut-info">
-                            <strong>youtube</strong>
-                            <span>YouTube</span>
-                        </div>
-                    </div>
-                    <div class="shortcut-card">
-                        <img src="https://www.amazon.com/favicon.ico" alt="Amazon">
-                        <div class="shortcut-info">
-                            <strong>amazon</strong>
-                            <span>Amazon</span>
-                        </div>
-                    </div>
-                    <div class="shortcut-card">
-                        <img src="https://en.wikipedia.org/favicon.ico" alt="Wikipedia">
-                        <div class="shortcut-info">
-                            <strong>wikipedia</strong>
-                            <span>Wikipedia</span>
-                        </div>
-                    </div>
-                    <div class="shortcut-card">
-                        <img src="https://www.github.com/favicon.ico" alt="GitHub">
-                        <div class="shortcut-info">
-                            <strong>github</strong>
-                            <span>GitHub</span>
-                        </div>
-                    </div>
-                </div>
+                <p>OmniSearch comes with these shortcuts ready to use:</p>
+                <div class="shortcuts-grid" id="shortcuts-grid"></div>
                 <p class="shortcuts-note">
-                    <strong>Pro tip:</strong> You can add your own custom shortcuts and manage all settings by clicking the OmniSearch icon in your toolbar!
+                    <strong>Pro tip:</strong> Right-click any site's search box and choose <em>Add a keyword for this search</em> to add it to OmniSearch.
                 </p>
             </section>
 
@@ -128,19 +85,23 @@
                 <div class="examples-list">
                     <div class="example">
                         <code>os youtube how to cook pasta</code>
-                        <span>→ Search YouTube for cooking tutorials</span>
+                        <span>→ Search YouTube</span>
                     </div>
                     <div class="example">
-                        <code>os drive quarterly report</code>
-                        <span>→ Find documents in Google Drive</span>
+                        <code>os youtube</code>
+                        <span>→ Leave out the search words to just open the site</span>
                     </div>
                     <div class="example">
-                        <code>os amazon wireless headphones</code>
-                        <span>→ Shop for headphones on Amazon</span>
+                        <code>os you cats</code>
+                        <span>→ Shortened keywords work too</span>
                     </div>
                     <div class="example">
-                        <code>os github react components</code>
-                        <span>→ Search GitHub repositories</span>
+                        <code>os youtube+amazon headphones</code>
+                        <span>→ Search several sites at once</span>
+                    </div>
+                    <div class="example">
+                        <code>os best pizza near me</code>
+                        <span>→ No matching keyword? You get a normal web search</span>
                     </div>
                 </div>
             </section>
@@ -150,8 +111,8 @@
                 <div class="next-steps-grid">
                     <div class="next-step">
                         <h3>🔧 Customize Settings</h3>
-                        <p>Click the OmniSearch icon to manage shortcuts, add custom ones, or disable sites you don't use.</p>
-                        <button class="btn btn-primary" id="open-settings">Open Settings</button>
+                        <p>Click the OmniSearch icon in the toolbar (or press Ctrl+Shift+S) to open the side panel. Add your own sites, pick from suggested ones, or turn off the ones you don't use.</p>
+                        <button class="btn btn-primary" id="open-settings">Open OmniSearch panel</button>
                     </div>
                     <div class="next-step">
                         <h3>🚀 Start Searching</h3>
@@ -166,11 +127,11 @@
             <p>Thanks for installing OmniSearch! We hope it makes your browsing more efficient.</p>
             <div class="footer-links">
                 <button class="link-button" id="close-welcome">Close Welcome Page</button>
-                <a href="https://github.com/yourusername/search-extension" target="_blank">View on GitHub</a>
+                <a href="https://github.com/wihoho/search-extension" target="_blank">View on GitHub</a>
             </div>
         </footer>
     </div>
 
-    <script src="welcome.js"></script>
+    <script type="module" src="welcome.js"></script>
 </body>
 </html>
