@@ -3,7 +3,7 @@
 import {
   loadShortcuts, loadUsage, saveShortcut, deleteShortcut, writeShortcuts, isShortcutChange,
   defaultShortcuts, catalog, cleanShortcutMap, validateShortcut, normalizeKeyword, isValidKeyword,
-  templateFromResultsUrl, hasPlaceholder, hostLabel, siteOrigin, originPattern, uiLanguage,
+  templateFromResultsUrl, hasPlaceholder, hostLabel, siteOrigin, originPattern, uiLanguage, rankKeywords,
 } from './lib/shortcuts.js';
 
 const $ = (id) => document.getElementById(id);
@@ -93,8 +93,9 @@ function renderList() {
   $('empty').hidden = keywords.length > 0;
   $('empty').textContent = total ? `No shortcuts match "${filter}".` : 'No shortcuts yet. Add one, or browse the suggested ones.';
 
-  const first = Object.keys(shortcuts).find((k) => shortcuts[k].enabled && shortcuts[k].type !== 'advanced');
-  $('tip-example').textContent = `os ${first || 'youtube'} cats`;
+  // Use the user's most-used search shortcut in the example.
+  const top = rankKeywords(shortcuts, usage).find((k) => shortcuts[k].type !== 'advanced');
+  $('tip-example').textContent = `os ${top || 'youtube'} cats`;
 }
 
 function listItem(keyword, shortcut) {
