@@ -212,9 +212,37 @@ const until = async (check, ms = 8000) => {
     await page.close();
   });
 
+  await step('asks for a review after the 5th search: one address bar row, once per session', async () => {
+    await sw.evaluate(() => chrome.storage.local.set({ usage: { loc: 5 }, rate: { askAt: 5, done: false, omniboxShown: 0 } }));
+    await sw.evaluate(() => omnisearch.onInputChanged('', () => {})); // nothing changes without a session start
+    const r = await changed('loc cats');
+    const row = r.suggestions.at(-1);
+    assert.equal(row.content, '★ review OmniSearch');
+    assert.ok(r.suggestions.length <= 5);
+    const pagePromise = ctx.waitForEvent('page');
+    await entered('★ review OmniSearch');
+    const page = await pagePromise;
+    await until(() => /\/reviews/.test(page.url()));
+    const { rate } = await sw.evaluate(() => chrome.storage.local.get('rate'));
+    assert.equal(rate.done, true);
+    assert.ok(!(await changed('loc cats')).suggestions.some((s) => s.content === '★ review OmniSearch'));
+    await page.close();
+  });
+
   const panel = await ctx.newPage();
   await panel.goto(extUrl('sidepanel.html'));
   const items = () => panel.locator('#list .item').count();
+
+  await step('side panel review banner: shows after 5 searches, "Later" hides it', async () => {
+    await sw.evaluate(() => chrome.storage.local.set({ rate: { askAt: 5, done: false, omniboxShown: 0 } }));
+    await until(async () => panel.isVisible('#rate'));
+    await panel.click('#rate-later');
+    await until(async () => panel.isHidden('#rate'));
+    const { rate, usage } = await sw.evaluate(() => chrome.storage.local.get(['rate', 'usage']));
+    const uses = Object.values(usage).reduce((a, b) => a + b, 0);
+    assert.equal(rate.askAt, uses + 20);
+    await sw.evaluate(() => chrome.storage.local.set({ rate: { askAt: 5, done: true, omniboxShown: 0 } }));
+  });
 
   await step('side panel lists shortcuts and filters', async () => {
     await until(async () => (await items()) === 15);

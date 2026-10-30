@@ -5,6 +5,7 @@ import {
   defaultShortcuts, catalog, cleanShortcutMap, validateShortcut, normalizeKeyword, isValidKeyword,
   templateFromResultsUrl, hasPlaceholder, hostLabel, siteOrigin, originPattern, uiLanguage, rankKeywords,
 } from './lib/shortcuts.js';
+import { loadRate, saveRate, shouldAsk, later, finish, totalUses, reviewUrl } from './lib/rate.js';
 
 const $ = (id) => document.getElementById(id);
 const lang = uiLanguage();
@@ -65,8 +66,11 @@ function show(view) {
   window.scrollTo(0, 0);
 }
 
+let rate = null;
+
 async function reload() {
-  [shortcuts, usage] = await Promise.all([loadShortcuts(), loadUsage()]);
+  [shortcuts, usage, rate] = await Promise.all([loadShortcuts(), loadUsage(), loadRate()]);
+  $('rate').hidden = !shouldAsk(rate, totalUses(usage));
   blocked = new Set();
   await Promise.all(Object.values(shortcuts).filter((s) => s.type === 'advanced').map(async (s) => {
     const pattern = originPattern(s.url);
@@ -413,6 +417,21 @@ function confirmDialog(text, okLabel) {
 }
 
 // ---------------------------------------------------------------------------
+// Review request
+
+async function answerRate(next) {
+  rate = next;
+  $('rate').hidden = true;
+  await saveRate(rate);
+}
+$('rate-yes').addEventListener('click', () => {
+  chrome.tabs.create({ url: reviewUrl() });
+  answerRate(finish(rate));
+});
+$('rate-later').addEventListener('click', () => answerRate(later(rate, totalUses(usage))));
+$('rate-never').addEventListener('click', () => answerRate(finish(rate)));
+
+// ---------------------------------------------------------------------------
 // Wiring
 
 $('filter').addEventListener('input', renderList);
@@ -428,7 +447,7 @@ document.addEventListener('keydown', (e) => {
 chrome.permissions.onAdded.addListener(reload);
 chrome.permissions.onRemoved.addListener(reload);
 chrome.storage.onChanged.addListener((changes, area) => {
-  if ((area === 'sync' && isShortcutChange(changes)) || (area === 'local' && changes.usage)) reload();
+  if ((area === 'sync' && isShortcutChange(changes)) || (area === 'local' && (changes.usage || changes.rate))) reload();
   if (area === 'session' && changes.pendingAdd?.newValue) takePendingAdd();
 });
 

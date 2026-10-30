@@ -6,18 +6,22 @@ import {
   rankKeywords, targetUrl, siteOrigin, hostLabel, originPattern, escapeXml, cleanShortcut,
 } from './lib/shortcuts.js';
 import { fillAndSubmit, detectSearchUrl } from './lib/page-scripts.js';
+import { RATE_CONTENT, loadRate, saveRate, shouldSuggest, finish, totalUses, reviewUrl } from './lib/rate.js';
 
 let shortcuts = {};
 let usage = {};
+let rate = null;
+let askedThisSession = false;
 let ready = refresh();
 
 async function refresh() {
-  [shortcuts, usage] = await Promise.all([loadShortcuts(), loadUsage()]);
+  [shortcuts, usage, rate] = await Promise.all([loadShortcuts(), loadUsage(), loadRate()]);
 }
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && isShortcutChange(changes)) ready = refresh();
   if (area === 'local' && changes.usage) usage = changes.usage.newValue || {};
+  if (area === 'local' && changes.rate) ready = refresh();
 });
 
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
@@ -40,6 +44,7 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
 const keywordLine = (k) => `<match>${escapeXml(k)}</match> <dim>${escapeXml(shortcuts[k].name)}</dim>`;
 
 chrome.omnibox.onInputStarted.addListener(() => {
+  askedThisSession = false;
   ready = refresh();
 });
 
@@ -90,6 +95,17 @@ async function onInputChanged(text, suggest) {
     }
   }
 
+  // After a few successful searches, one quiet row asks for a review (for a few sessions only).
+  if (shouldSuggest(rate, totalUses(usage))) {
+    suggestions.splice(4);
+    suggestions.push({ content: RATE_CONTENT, description: '★ Enjoying OmniSearch? <dim>Select this to leave a quick review</dim>' });
+    if (!askedThisSession) {
+      askedThisSession = true;
+      rate = { ...rate, omniboxShown: rate.omniboxShown + 1 };
+      saveRate(rate);
+    }
+  }
+
   chrome.omnibox.setDefaultSuggestion({ description });
   suggest(suggestions);
   return { description, suggestions };
@@ -97,6 +113,12 @@ async function onInputChanged(text, suggest) {
 
 async function onInputEntered(text, disposition) {
   await ready;
+  if (text === RATE_CONTENT) {
+    chrome.tabs.create({ url: reviewUrl() });
+    rate = finish(rate);
+    await saveRate(rate);
+    return;
+  }
   const { keywords, query } = resolveInput(shortcuts, text, usage);
   if (!keywords) {
     const words = text.trim();

@@ -269,3 +269,8 @@ dialog {
   max-width: 320px;
 }
 dialog::backdrop { background: rgba(0, 0, 0, 0.35); }
+
+/* Review request */
+.rate { margin: 0 0 12px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; display: grid; gap: 6px; }
+.rate span { color: var(--muted); }
+.rate .row { display: flex; gap: 8px; align-items: center; }
