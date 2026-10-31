@@ -6,6 +6,9 @@ import {
   templateFromResultsUrl, hasPlaceholder, hostLabel, siteOrigin, originPattern, uiLanguage, rankKeywords,
 } from './lib/shortcuts.js';
 import { loadRate, saveRate, shouldAsk, later, finish, totalUses, reviewUrl } from './lib/rate.js';
+import { catchErrors } from './lib/telemetry.js';
+
+catchErrors('sidepanel');
 
 const $ = (id) => document.getElementById(id);
 const lang = uiLanguage();

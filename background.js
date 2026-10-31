@@ -7,6 +7,11 @@ import {
 } from './lib/shortcuts.js';
 import { fillAndSubmit, detectSearchUrl } from './lib/page-scripts.js';
 import { RATE_CONTENT, loadRate, saveRate, shouldSuggest, finish, totalUses, reviewUrl } from './lib/rate.js';
+import { catchErrors, reportError, trackInstalls, trackTask } from './lib/telemetry.js';
+
+// Anonymous counts: installs, searches run through a shortcut, errors. See lib/telemetry.js.
+trackInstalls();
+catchErrors('background');
 
 let shortcuts = {};
 let usage = {};
@@ -128,6 +133,7 @@ async function onInputEntered(text, disposition) {
     return;
   }
   recordUse(keywords);
+  trackTask();
   for (const [i, keyword] of keywords.entries()) {
     // The first site opens where the user asked; the rest open in background tabs.
     run(shortcuts[keyword], query, i === 0 ? disposition : 'newBackgroundTab');
@@ -168,6 +174,7 @@ async function run(shortcut, query, disposition) {
     });
     return result.ok ? result : flagTab(tab.id, origin, result.error);
   } catch (error) {
+    reportError('fill-page', error);
     return flagTab(tab.id, origin, `Couldn't type into ${shortcut.name}: ${error.message}`);
   }
 }
