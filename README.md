@@ -15,7 +15,7 @@ Type `os`, press <kbd>Space</kbd> or <kbd>Tab</kbd>, then a keyword and your sea
 
 Results open in the current tab. <kbd>Alt</kbd>+<kbd>Enter</kbd> opens them in a new tab.
 
-[Chrome Web Store](https://chromewebstore.google.com/detail/eihpnhdoneijgoppfeldaclpkllomacc)
+[Chrome Web Store](https://chromewebstore.google.com/detail/eihpnhdoneijgoppfeldaclpkllomacc) · [Website](https://wihoho.github.io/privacy/extensions/omnisearch/) · [Guide: search any website from Chrome's address bar](https://wihoho.github.io/privacy/extensions/guides/search-a-website-from-chrome-address-bar/) · [More free extensions by the same developer](https://wihoho.github.io/privacy/extensions/)
 
 ## Managing shortcuts
 
